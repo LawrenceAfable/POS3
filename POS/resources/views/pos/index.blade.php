@@ -126,7 +126,7 @@
                 <select id="payment_mode" class="form-control">
                   <option value="cash">Cash</option>
                   <option value="card">Card</option>
-                  <option value="mobile">Mobile Payment</option>
+                  <option value="mobile payment">Mobile Payment</option>
                 </select>
               </div>
 

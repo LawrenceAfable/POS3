@@ -2,7 +2,7 @@
   <ul class="nav flex-column">
     <li class="nav-item mb-2">
       <a class="nav-link d-flex align-items-center text-dark px-3 py-2 rounded hover-effect" href="{{route('dashboard')}}">
-        <i class="bi bi-speedometer2 me-2"></i> Dashboard
+        <i class="bi bi-house-door me-2"></i> Dashboard
       </a>
     </li>
 
@@ -10,7 +10,7 @@
     @if(Auth::check() && (Auth::user()->role === 'admin' || Auth::user()->role === 'cashier'))
     <li class="nav-item mb-2">
       <a class="nav-link d-flex align-items-center text-dark px-3 py-2 rounded hover-effect" href="{{ route('pos.index') }}">
-        <i class="bi bi-cash-register me-2"></i> POS
+        <i class="bi bi-box-seam me-2"></i> POS
       </a>
     </li>
     @endif
@@ -37,23 +37,22 @@
 
     <li class="nav-item mb-2">
       <a class="nav-link d-flex align-items-center text-dark px-3 py-2 rounded hover-effect" href="{{ route('customers.index') }}">
-        <i class="bi bi-truck me-2"></i> Customer
+        <i class="bi bi-person me-2"></i> Customer
       </a>
     </li>
 
     <li class="nav-item mb-2">
       <a class="nav-link d-flex align-items-center text-dark px-3 py-2 rounded hover-effect" href="{{ route('admin.userrole.index') }}">
-        <i class="bi bi-truck me-2"></i> User Management
+        <i class="bi bi-person-fill me-2"></i> User Management
       </a>
     </li>
 
     <li class="nav-item mb-2">
       <a class="nav-link d-flex align-items-center text-dark px-3 py-2 rounded hover-effect" href="{{route('sales.index')}}">
-        <i class="bi bi-truck me-2"></i> Sale Transaction
+        <i class="bi bi-journal-check me-2"></i> Sale Transaction
       </a>
     </li>
     @endif
 
   </ul>
 </aside>
-

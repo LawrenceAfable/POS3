@@ -21,15 +21,20 @@ class POSController extends Controller
         return view('pos.index', compact('products', 'cart', 'customers'));
     }
 
-
     public function addToCart(Request $request)
     {
         // Get product ID and quantity from request
         $productId = $request->input('product_id');
         $quantity = $request->input('quantity');
 
+        // Ensure the quantity is a positive integer and not greater than available stock
+        if ($quantity <= 0) {
+            return response()->json(['error' => 'Quantity must be greater than zero.'], 400);
+        }
+
         // Find the product from the database
         $product = Product::find($productId);
+
 
         // Check if product exists and if there is enough stock
         if (!$product || $product->quantity < $quantity) {
