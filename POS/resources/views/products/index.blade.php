@@ -9,6 +9,7 @@
   <table class="table table-bordered">
     <thead>
       <tr>
+        <th>SKU</th>
         <th>Name</th>
         <th>Description</th>
         <th>Category</th>
@@ -23,19 +24,24 @@
     <tbody>
       @forelse($products as $product)
       <tr>
+      <td>{{ $product->sku }}</td>
       <td>{{ $product->name }}</td>
       <td>{{ $product->description }}</td>
       <td>{{ $product->category->name ?? 'N/A' }}</td>
       <td>{{ $product->supplier->name ?? 'N/A' }}</td>
       <td>{{ $product->price }}</td>
-      <td>{{ $product->quantity }}</td>
+      <td>{{ $product->quantity }}
+        @if($product->quantity < $product->low_stock_threshold)
+        <span class="text-danger">Low Stock</span>
+      @endif
+      </td>
       <td>
         <!-- View button to redirect to the product view page -->
         <a href="{{ route('products.view', $product->product_id) }}" class="btn btn-info">View</a>
       </td>
       <td>
         <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editProductModal"
-        data-id="{{ $product->product_id }}" data-name="{{ $product->name }}"
+        data-id="{{ $product->product_id }}" data-sku="{{$product->sku}}" data-name="{{ $product->name }}"
         data-description="{{ $product->description }}" data-category="{{ $product->category_id }}"
         data-supplier="{{ $product->supplier_id }}" data-price="{{ $product->price }}"
         data-quantity="{{ $product->quantity }}">
@@ -78,6 +84,7 @@
     // Edit Modal Logic
     const editProductModal = document.getElementById('editProductModal');
     const editForm = document.getElementById('editProductForm');
+    const editSKUInput = document.getElementById('edit-sku'); // new
     const editNameInput = document.getElementById('edit-name');
     const editDescriptionInput = document.getElementById('edit-description');
     const editCategoryInput = document.getElementById('edit-category');
@@ -89,6 +96,7 @@
       const button = event.relatedTarget;
 
       editForm.action = `/product/${button.getAttribute('data-id')}/update`;
+      editSKUInput.value = button.getAttribute('data-sku'); // new
       editNameInput.value = button.getAttribute('data-name');
       editDescriptionInput.value = button.getAttribute('data-description');
       editCategoryInput.value = button.getAttribute('data-category');

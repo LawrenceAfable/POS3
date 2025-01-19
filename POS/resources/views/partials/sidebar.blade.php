@@ -36,8 +36,20 @@
     </li>
 
     <li class="nav-item mb-2">
+      <a class="nav-link d-flex align-items-center text-dark px-3 py-2 rounded hover-effect" href="{{ route('customers.index') }}">
+        <i class="bi bi-truck me-2"></i> Customer
+      </a>
+    </li>
+
+    <li class="nav-item mb-2">
       <a class="nav-link d-flex align-items-center text-dark px-3 py-2 rounded hover-effect" href="{{ route('admin.userrole.index') }}">
         <i class="bi bi-truck me-2"></i> User Management
+      </a>
+    </li>
+
+    <li class="nav-item mb-2">
+      <a class="nav-link d-flex align-items-center text-dark px-3 py-2 rounded hover-effect" href="{{route('sales.index')}}">
+        <i class="bi bi-truck me-2"></i> Sale Transaction
       </a>
     </li>
     @endif

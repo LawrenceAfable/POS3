@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Customer extends Model
 {
     use HasFactory;
-
+    protected $table = 'customers'; 
     // Define the fillable attributes for mass assignment
     protected $fillable = [
         'name',

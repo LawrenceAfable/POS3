@@ -12,6 +12,11 @@
           @method('POST')
 
           <div class="mb-3">
+            <label for="sku" class="form-label">SKU</label>
+            <input type="text" class="form-control" name="sku" placeholder="SKU" required>
+          </div>
+
+          <div class="mb-3">
             <label for="name" class="form-label">Product Name</label>
             <input type="text" class="form-control" name="name" placeholder="Product Name" required>
           </div>
@@ -28,11 +33,11 @@
 
           <div class="mb-3">
             <label for="category_id" class="form-label">Category</label>
-            <select class="form-select" name="category_id">   <!-- required -->
+            <select class="form-select" name="category_id"> <!-- required -->
               <option value="">Select Category</option>
               @foreach($categories as $category)
-                <option value="{{ $category->category_id }}">{{ $category->name }}</option>
-              @endforeach
+          <option value="{{ $category->category_id }}">{{ $category->name }}</option>
+        @endforeach
             </select>
           </div>
 
@@ -52,8 +57,8 @@
             <select class="form-select" name="supplier_id">
               <option value="">Select Supplier</option>
               @foreach($suppliers as $supplier)
-                <option value="{{ $supplier->supplier_id }}">{{ $supplier->name }}</option>
-              @endforeach
+          <option value="{{ $supplier->supplier_id }}">{{ $supplier->name }}</option>
+        @endforeach
             </select>
           </div>
 

@@ -14,6 +14,7 @@
                     <h4>{{ $product->name }}</h4>
                 </div>
                 <div class="card-body">
+                    <p><strong>SKU:</strong> {{ $product->sku }}</p>
                     <p><strong>Description:</strong> {{ $product->description }}</p>
                     <p><strong>Price:</strong> {{ $product->price }}</p>
                     <p><strong>Quantity in Stock:</strong> {{ $product->quantity }}</p>

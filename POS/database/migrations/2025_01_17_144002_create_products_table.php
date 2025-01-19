@@ -22,6 +22,11 @@ return new class extends Migration
             $table->unsignedBigInteger('supplier_id')->nullable(); // Foreign key (nullable)
             $table->timestamps();
 
+             // New Columns
+             $table->string('sku')->unique(); // SKU (unique for each product)  
+             $table->unsignedInteger('low_stock_threshold')->default(5); // Low stock threshold (default 5)
+ 
+
             // Foreign key constraints
             $table->foreign('category_id')->references('category_id')->on('categories')->onDelete('set null'); // Make category_id nullable
             $table->foreign('supplier_id')->references('supplier_id')->on('suppliers')->onDelete('set null'); // supplier_id already nullable

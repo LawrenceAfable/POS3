@@ -6,7 +6,9 @@ use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\POSController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\UserManagementController;
+use App\Http\Controllers\SaleManagementController;
 use Illuminate\Support\Facades\Auth;
 
 // Default route
@@ -39,12 +41,11 @@ Route::middleware(['auth'])->group(function () { // change the auth to ['auth', 
 
     // POS (Accessible to Admin and Cashier)
     Route::middleware(['auth', 'role:admin,cashier'])->group(function () {
+        // POS Routes
         Route::get('/pos', [POSController::class, 'index'])->name('pos.index');
         Route::post('/pos/add-to-cart', [POSController::class, 'addToCart'])->name('pos.addToCart');
-        // Checkout
-        Route::post('/pos/checkout', [POSController::class, 'checkout'])->name('pos.checkout');
-        // Remove from Cart (optional)
         Route::post('/pos/remove-from-cart', [POSController::class, 'removeFromCart'])->name('pos.removeFromCart');
+        Route::post('/pos/checkout', [POSController::class, 'checkout'])->name('pos.checkout');
     });
 
     // Admin-Only Routes
@@ -68,10 +69,19 @@ Route::middleware(['auth'])->group(function () { // change the auth to ['auth', 
         Route::put('/product/{product}/update', [ProductController::class, 'update'])->name('products.update');
         Route::delete('/product/{product}/destroy', [ProductController::class, 'destroy'])->name('products.destroy');
 
+        // Customers
+        Route::get('/customer', [CustomerController::class, 'index'])->name('customers.index');
+        Route::post('/customer', [CustomerController::class, 'store'])->name('customers.store');
+        Route::put('/customer/{customer}/update', [CustomerController::class, 'update'])->name('customers.update');
+        Route::delete('/customer/{customer}/destroy', [CustomerController::class, 'destroy'])->name('customers.destroy');
+
         // User Management
         Route::get('/user-dashboard', [UserManagementController::class, 'index'])->name('admin.userrole.index');
         Route::post('/user-add', [UserManagementController::class, 'store'])->name('users.store');
         Route::put('/user/{id}/update', [UserManagementController::class, 'update'])->name('users.update');
         Route::delete('/user/{id}/destroy', [UserManagementController::class, 'destroy'])->name('users.destroy');
+
+        // Sales Transaction
+        Route::get('/sales-transaction', [SaleManagementController::class, 'index'])->name('sales.index');
     });
 });

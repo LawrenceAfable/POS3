@@ -13,13 +13,20 @@ class Product extends Model
         'category_id',
         'image_url',
         'quantity',
-        'supplier_id'
+        'supplier_id',
+        'sku',
+        'low_stock_threshold'
     ];
 
     protected $primaryKey = 'product_id'; // Define the custom primary key
 
     public $incrementing = true; // Ensure it's an auto-incrementing key
     protected $keyType = 'int';  // Ensure the primary key is an integer
+
+    public function orderDetails() {
+        return $this->hasMany(Order_Detail::class);
+    }
+    
 
     public function category()
     {

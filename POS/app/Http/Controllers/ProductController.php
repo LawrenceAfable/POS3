@@ -31,6 +31,7 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         $request->validate([
+            'sku' => 'required|string|max:100',
             'name' => 'required|string|max:255|unique:products,name',
             'description' => 'nullable|string|max:500',
             'price' => 'required|numeric|min:0',
@@ -46,6 +47,7 @@ class ProductController extends Controller
         }
 
         Product::create([
+            'sku' => $request->sku,
             'name' => $request->name,
             'description' => $request->description,
             'price' => $request->price,
@@ -61,6 +63,7 @@ class ProductController extends Controller
     public function update(Product $product, Request $request)
     {
         $request->validate([
+            'sku' => 'required|string|max:100|unique:products,sku,' . $product->product_id . ',product_id',
             'name' => 'required|string|max:255|unique:products,name,' . $product->product_id . ',product_id',
             'description' => 'nullable|string|max:500',
             'price' => 'required|numeric|min:0',
@@ -82,6 +85,7 @@ class ProductController extends Controller
         }
 
         $product->update([
+            'sku' => $request->sku,
             'name' => $request->name,
             'description' => $request->description,
             'price' => $request->price,
