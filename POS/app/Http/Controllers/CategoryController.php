@@ -7,11 +7,23 @@ use App\Models\Category;
 
 class CategoryController extends Controller
 {
-    public function index()
+
+    public function index(Request $request)
     {
-        $categories = Category::all();
-        return view('categories.index', ['categories' => $categories]);
+        $search = $request->input('search'); // Get the search input
+        $categories = Category::query()
+            ->when($search, function ($query, $search) {
+                $query->where('name', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%");
+            })
+            ->get(); // Fetch filtered categories
+
+        return view('categories.index', [
+            'categories' => $categories,
+            'search' => $search, // Pass the search term back to the view
+        ]);
     }
+
 
     public function store(Request $request)
     {

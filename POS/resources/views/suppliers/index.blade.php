@@ -5,7 +5,17 @@
 
 @section('content')
 <div>
-  <input type="text" class="form-control mb-3" placeholder="Search categories...">
+   <!-- Search Form -->
+   <form method="GET" action="{{ route('suppliers.index') }}" class="mb-3">
+    <input 
+      type="text" 
+      name="search" 
+      class="form-control" 
+      placeholder="Search suppliers..." 
+      value="{{ $search ?? '' }}"  
+    >
+  </form>
+
   <table class="table table-bordered">
     <thead>
       <tr>

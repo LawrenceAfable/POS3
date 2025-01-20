@@ -7,12 +7,45 @@ use App\Models\Supplier;
 
 class SupplierController extends Controller
 {
-    public function index()
+    public function index1()
     {
         $suppliers = Supplier::all();
         return view('suppliers.index', ['suppliers' => $suppliers]);
-    }   
+    }
 
+    public function index(Request $request)
+    {
+        $search = $request->input('search'); // Get the search input
+        $suppliers = Supplier::query()
+            ->when($search, function ($query, $search) {
+                $query->where('name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('phone', 'like', "%{$search}%")
+                    ->orWhere('address', 'like', "%{$search}%");
+            })
+            ->get(); // Fetch filtered suppliers
+
+        return view('suppliers.index', [
+            'suppliers' => $suppliers,
+            'search' => $search, // Pass the search term back to the view
+        ]);
+    }
+
+    public function search(Request $request)
+    {
+        $search = $request->input('search');
+
+        $suppliers = Supplier::query()
+            ->when($search, function ($query, $search) {
+                $query->where('name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('phone', 'like', "%{$search}%")
+                    ->orWhere('address', 'like', "%{$search}%");
+            })
+            ->get();
+
+        return response()->json($suppliers); // Return results as JSON
+    }
 
     public function store(Request $request)
     {
@@ -31,7 +64,7 @@ class SupplierController extends Controller
         ]);
 
         return redirect()->route('suppliers.index')->with('success', 'Supplier created successfully!');
-    }   
+    }
 
     public function update(Supplier $supplier, Request $request)
     {

@@ -6,11 +6,16 @@
 @section('content')
 <div>
   <!-- Search Form -->
-  <form id="searchForm" method="GET" action="{{ route('products.index') }}">
-    <input type="text" name="search" id="search" class="form-control mb-3" placeholder="Search products...">
+  <form method="GET" action="{{ route('products.index') }}" class="mb-3">
+    <input 
+      type="text" 
+      name="search" 
+      class="form-control" 
+      placeholder="Search products.." 
+      value="{{ $search ?? '' }}"  
+    >
   </form>
-
-  <!-- Product Table -->
+  
   <table class="table table-bordered">
     <thead>
       <tr>
@@ -26,44 +31,45 @@
         <th>Delete</th>
       </tr>
     </thead>
-    <tbody id="productTableBody">
+    <tbody>
       @forelse($products as $product)
-        <tr>
-          <td>{{ $product->sku }}</td>
-          <td>{{ $product->name }}</td>
-          <td>{{ $product->description }}</td>
-          <td>{{ $product->category->name ?? 'N/A' }}</td>
-          <td>{{ $product->supplier->name ?? 'N/A' }}</td>
-          <td>{{ $product->price }}</td>
-          <td>{{ $product->quantity }}
-            @if($product->quantity < $product->low_stock_threshold)
-              <span class="text-danger">Low Stock</span>
-            @endif
-          </td>
-          <td>
-            <a href="{{ route('products.view', $product->product_id) }}" class="btn btn-info">View</a>
-          </td>
-          <td>
-            <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editProductModal"
-            data-id="{{ $product->product_id }}" data-sku="{{$product->sku}}" data-name="{{ $product->name }}"
-            data-description="{{ $product->description }}" data-category="{{ $product->category_id }}"
-            data-supplier="{{ $product->supplier_id }}" data-price="{{ $product->price }}"
-            data-quantity="{{ $product->quantity }}">
-            Edit
-            </button>
-          </td>
-          <td>
-            <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
-            data-bs-target="#deleteProductModal" data-id="{{ $product->product_id }}" data-name="{{ $product->name }}">
-            Delete
-            </button>
-          </td>
-        </tr>
-      @empty
-        <tr>
-        <td colspan="8">No products available.</td>
-        </tr>
-      @endforelse
+      <tr>
+      <td>{{ $product->sku }}</td>
+      <td>{{ $product->name }}</td>
+      <td>{{ $product->description }}</td>
+      <td>{{ $product->category->name ?? 'N/A' }}</td>
+      <td>{{ $product->supplier->name ?? 'N/A' }}</td>
+      <td>{{ $product->price }}</td>
+      <td>{{ $product->quantity }}
+        @if($product->quantity < $product->low_stock_threshold)
+      <span class="text-danger">Low Stock</span>
+    @endif
+      </td>
+      <td>
+        <!-- View button to redirect to the product view page -->
+        <a href="{{ route('products.view', $product->product_id) }}" class="btn btn-info">View</a>
+      </td>
+      <td>
+        <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editProductModal"
+        data-id="{{ $product->product_id }}" data-sku="{{$product->sku}}" data-name="{{ $product->name }}"
+        data-description="{{ $product->description }}" data-category="{{ $product->category_id }}"
+        data-supplier="{{ $product->supplier_id }}" data-price="{{ $product->price }}"
+        data-quantity="{{ $product->quantity }}">
+        Edit
+        </button>
+      </td>
+      <td>
+        <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
+        data-bs-target="#deleteProductModal" data-id="{{ $product->product_id }}" data-name="{{ $product->name }}">
+        Delete
+        </button>
+      </td>
+      </tr>
+    @empty
+      <tr>
+      <td colspan="8">No products available.</td>
+      </tr>
+    @endforelse
     </tbody>
   </table>
 </div>
@@ -82,57 +88,43 @@
 
 @endsection
 
+<!-- Dynamic Modal Script -->
 <script>
-  document.getElementById('search').addEventListener('input', function() {
-    const query = this.value;
+  document.addEventListener('DOMContentLoaded', function () {
+    // Edit Modal Logic
+    const editProductModal = document.getElementById('editProductModal');
+    const editForm = document.getElementById('editProductForm');
+    const editSKUInput = document.getElementById('edit-sku'); // new
+    const editNameInput = document.getElementById('edit-name');
+    const editDescriptionInput = document.getElementById('edit-description');
+    const editCategoryInput = document.getElementById('edit-category');
+    const editSupplierInput = document.getElementById('edit-supplier');
+    const editPriceInput = document.getElementById('edit-price');
+    const editQuantityInput = document.getElementById('edit-quantity');
 
-    // Use fetch to send the query and get results
-    fetch(`{{ route('products.index') }}?search=${query}`, {
-      method: 'GET',
-      headers: {
-        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-      }
-    })
-    .then(response => response.json())
-    .then(data => {
-      const tbody = document.getElementById('productTableBody');
-      tbody.innerHTML = ''; // Clear previous results
-      if (data.products.length > 0) {
-        data.products.forEach(product => {
-          const tr = document.createElement('tr');
-          tr.innerHTML = `
-            <td>${product.sku}</td>
-            <td>${product.name}</td>
-            <td>${product.description}</td>
-            <td>${product.category.name ?? 'N/A'}</td>
-            <td>${product.supplier.name ?? 'N/A'}</td>
-            <td>${product.price}</td>
-            <td>${product.quantity}</td>
-            <td>
-              <a href="/products/view/${product.product_id}" class="btn btn-info">View</a>
-            </td>
-            <td>
-              <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editProductModal"
-              data-id="${product.product_id}" data-sku="${product.sku}" data-name="${product.name}"
-              data-description="${product.description}" data-category="${product.category_id}"
-              data-supplier="${product.supplier_id}" data-price="${product.price}"
-              data-quantity="${product.quantity}">
-              Edit
-              </button>
-            </td>
-            <td>
-              <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
-              data-bs-target="#deleteProductModal" data-id="${product.product_id}" data-name="${product.name}">
-              Delete
-              </button>
-            </td>
-          `;
-          tbody.appendChild(tr);
-        });
-      } else {
-        tbody.innerHTML = '<tr><td colspan="10" class="text-center">No products found.</td></tr>';
-      }
-    })
-    .catch(error => console.error('Error:', error));
+    editProductModal.addEventListener('show.bs.modal', function (event) {
+      const button = event.relatedTarget;
+
+      editForm.action = `/product/${button.getAttribute('data-id')}/update`;
+      editSKUInput.value = button.getAttribute('data-sku'); // new
+      editNameInput.value = button.getAttribute('data-name');
+      editDescriptionInput.value = button.getAttribute('data-description');
+      editCategoryInput.value = button.getAttribute('data-category');
+      editSupplierInput.value = button.getAttribute('data-supplier');
+      editPriceInput.value = button.getAttribute('data-price');
+      editQuantityInput.value = button.getAttribute('data-quantity');
+    });
+
+    // Delete Modal Logic
+    const deleteProductModal = document.getElementById('deleteProductModal');
+    const deleteForm = document.getElementById('deleteProductForm');
+    const deleteProductName = document.getElementById('delete-product-name');
+
+    deleteProductModal.addEventListener('show.bs.modal', function (event) {
+      const button = event.relatedTarget;
+
+      deleteForm.action = `/product/${button.getAttribute('data-id')}/destroy`;
+      deleteProductName.textContent = button.getAttribute('data-name');
+    });
   });
 </script>

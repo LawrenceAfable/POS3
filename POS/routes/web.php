@@ -1,5 +1,6 @@
 <?php
 
+
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\SupplierController;
@@ -9,6 +10,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\UserManagementController;
 use App\Http\Controllers\SaleManagementController;
+use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Auth;
 
 // Default route
@@ -30,10 +32,12 @@ Route::post('/logout', function () {
 
 // Routes accessible only to authenticated users
 Route::middleware(['auth'])->group(function () { // change the auth to ['auth', 'role:admin'] if only the admin can access dashboard
-    // Common Dashboard
-    Route::get('/dashboard', function () {
-        return view('dashboard.index');
-    })->name('dashboard');
+
+    // // Common Dashboard
+    // Route::get('/dashboard', function () {
+    //     return view('dashboard.index');
+    // })->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // User Profile
     Route::get('/user-profile', [AuthController::class, 'profile'])->name('users.profile');
@@ -61,6 +65,7 @@ Route::middleware(['auth'])->group(function () { // change the auth to ['auth', 
         Route::post('/supplier', [SupplierController::class, 'store'])->name('suppliers.store');
         Route::put('/supplier/{supplier}/update', [SupplierController::class, 'update'])->name('suppliers.update');
         Route::delete('/supplier/{supplier}/destroy', [SupplierController::class, 'destroy'])->name('suppliers.destroy');
+
 
         // Products
         Route::get('products/{product_id}/view', [ProductController::class, 'show'])->name('products.view');

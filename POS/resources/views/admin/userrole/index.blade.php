@@ -5,8 +5,16 @@
 
 @section('content')
 <div>
-  <!-- Search Bar -->
-  <input type="text" class="form-control mb-3" placeholder="Search users...">
+  <!-- Search Form -->
+  <form method="GET" action="{{ route('admin.userrole.index') }}" class="mb-3">
+    <input 
+      type="text" 
+      name="search" 
+      class="form-control" 
+      placeholder="Search users.." 
+      value="{{ $search ?? '' }}"  
+    >
+  </form>
 
   <!-- Users Table -->
   <table class="table table-bordered">

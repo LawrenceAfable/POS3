@@ -9,26 +9,24 @@
   <table class="table table-bordered">
     <thead>
       <tr>
-        <th>Transaction ID</th>
-        <th>Order ID</th>
         <th>User Name</th>
         <th>User Role</th>
         <th>Product SKU</th>
         <th>Product Name</th>
         <th>Amount Paid</th>
+        <th>Change</th>
         <th>Order Date</th>
       </tr>
     </thead>
     <tbody>
       @forelse($transactions as $transaction)
       <tr>
-        <td>{{ $transaction->transaction_id }}</td>
-        <td>{{ $transaction->order_id }}</td>
         <td>{{ $transaction->user_name }}</td>
         <td>{{ $transaction->user_role }}</td>
         <td>{{ $transaction->product_sku }}</td>
         <td>{{ $transaction->product_name }}</td>
         <td>{{ number_format($transaction->amount_paid, 2) }}</td>
+        <td>{{ number_format($transaction->change, 2) }}</td>
         <td>{{ $transaction->order_date }}</td>
       </tr>
       @empty

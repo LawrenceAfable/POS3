@@ -7,11 +7,30 @@ use App\Models\Customer;
 
 class CustomerController extends Controller
 {
-    public function index()
+    public function index1()
     {
         $customers = Customer::all();
         return view('customers.index', ['customers' => $customers]);
     }
+
+    public function index(Request $request)
+    {
+        $search = $request->input('search'); // Get the search input
+
+        $customers = Customer::query()
+            ->when($search, function ($query, $search) {
+                $query->where('name', 'like', "%{$search}%")
+                    ->orWhere('contact_number', 'like', "%{$search}%");
+                // Add more fields if necessary, like filtering by related orders, etc.
+            })
+            ->get(); // Fetch filtered customers
+
+        return view('customers.index', [
+            'customers' => $customers,
+            'search' => $search, // Pass the search term back to the view
+        ]);
+    }
+
 
     public function store(Request $request)
     {

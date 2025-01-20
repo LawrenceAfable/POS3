@@ -9,18 +9,37 @@ use App\Models\Supplier;
 
 class ProductController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $products = Product::all();
-        $categories = Category::all();
-        $suppliers = Supplier::all();
+        $search = $request->input('search'); // Get the search input
+
+        $products = Product::query()
+            ->when($search, function ($query, $search) {
+                $query->where('name', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%")
+                    ->orWhere('sku', 'like', "%{$search}%")
+                    ->orWhereHas('category', function ($query) use ($search) {
+                        $query->where('name', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('supplier', function ($query) use ($search) {
+                        $query->where('name', 'like', "%{$search}%")
+                            ->orWhere('email', 'like', "%{$search}%");
+                    });
+            })
+            ->get(); // Fetch filtered products
+
+        $categories = Category::all(); // Fetch all categories
+        $suppliers = Supplier::all(); // Fetch all suppliers
 
         return view("products.index", [
             'products' => $products,
             'categories' => $categories,
-            'suppliers' => $suppliers
+            'suppliers' => $suppliers,
+            'search' => $search, // Pass the search term back to the view
         ]);
     }
+
+
 
     public function show($product_id)
     {
