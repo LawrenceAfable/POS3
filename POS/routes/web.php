@@ -11,6 +11,7 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\UserManagementController;
 use App\Http\Controllers\SaleManagementController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\SettingController;
 use Illuminate\Support\Facades\Auth;
 
 // Default route
@@ -88,5 +89,13 @@ Route::middleware(['auth'])->group(function () { // change the auth to ['auth', 
 
         // Sales Transaction
         Route::get('/sales-transaction', [SaleManagementController::class, 'index'])->name('sales.index');
+
+        // Setting
+        Route::get('/setting', [SettingController::class, 'index'])->name('settings.index');
+        Route::put('/settings', [SettingController::class, 'update'])->name('settings.update');
+
+        // Invoice
+        Route::post('/pos/invoice-preview', [POSController::class, 'generateInvoicePreview'])->name('pos.invoice-preview');
+
     });
 });

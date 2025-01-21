@@ -1,0 +1,32 @@
+SELECT 
+    transactions.transaction_id,
+    transactions.payment_method,
+    transactions.amount_paid,
+    transactions.change,
+
+    orders.order_id,
+    orders.order_date,
+    orders.customer_id,
+
+    customers.name AS customer_name,
+    customers.contact_number,
+
+    orders.user_id,
+    orders.total_amount,
+    orders.discount,
+    orders.tax,
+
+    order_details.product_id,
+
+    products.name AS product_name,
+
+    order_details.quantity,
+    order_details.price,
+    order_details.subtotal
+
+FROM transactions
+INNER JOIN orders ON transactions.order_id = orders.order_id
+LEFT JOIN customers ON orders.customer_id = customers.customer_id
+INNER JOIN order_details ON orders.order_id = order_details.order_id
+INNER JOIN products ON order_details.product_id = products.product_id
+ORDER BY transactions.transaction_id DESC;

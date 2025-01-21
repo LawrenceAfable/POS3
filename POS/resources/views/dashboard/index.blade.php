@@ -62,20 +62,6 @@
     </div>
   </div>
 
-  <!-- Recent Activities Section -->
-  <div class="card mt-4">
-    <div class="card-header">
-      <h5>Recent Activities</h5>
-    </div>
-    <div class="card-body">
-      <ul>
-        <li>User John Doe registered.</li>
-        <li>Product 'Product A' was updated.</li>
-        <li>Order #1234 completed successfully.</li>
-      </ul>
-    </div>
-  </div>
-
   <!-- Welcome Message -->
   <div class="card mt-4">
     <div class="card-body">

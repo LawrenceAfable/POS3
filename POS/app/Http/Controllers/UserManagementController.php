@@ -53,7 +53,10 @@ class UserManagementController extends Controller
             'password' => Hash::make($request['password'])
         ]);
 
-        return redirect()->route('admin.userrole.index')->with('success', 'User added successfully.');
+        session()->flash('success', 'User added successfully.');
+        return redirect()->route('admin.userrole.index');
+
+       // return redirect()->route('admin.userrole.index')->with('success', 'User added successfully.');
     }
 
     public function Update(Request $request, $id)
@@ -67,6 +70,13 @@ class UserManagementController extends Controller
         ]);
 
         $user = User::findOrFail($id);
+
+        // Prevent the logged-in admin from changing their own role
+        if (auth()->user()->id === $user->id && $request->role !== 'admin') {
+            session()->flash('error', 'You cannot change your own role.');
+            return redirect()->back();
+        }
+
         $updateData = [
             'name' => $request->name,
             'email' => $request->email,
@@ -80,9 +90,11 @@ class UserManagementController extends Controller
 
         $user->update($updateData);
 
-
-        return redirect()->route('admin.userrole.index')->with('success', 'User updated successfully.');
+        session()->flash('success', 'User updated successfully.');
+        return redirect()->route('admin.userrole.index');
     }
+
+
 
 
     // Delete a user
@@ -97,6 +109,7 @@ class UserManagementController extends Controller
         }
 
         $user->delete();
-        return redirect()->route('admin.userrole.index')->with('success', 'User deleted successfully.');
+        session()->flash('success', 'User deleted successfully.');
+        return redirect()->route('admin.userrole.index');
     }
 }

@@ -14,11 +14,17 @@
           <h3>Product List</h3>
         </div>
         <div class="card-body">
-          <input type="text" class="form-control mb-3" placeholder="Search products...">
+
+          <form method="GET" action="{{ route('pos.index') }}" class="mb-3">
+            <input type="text" name="search" class="form-control" placeholder="Search products.."
+              value="{{ $search ?? '' }}">
+          </form>
+          <div style="overflow-x:auto;">
           <table class="table table-bordered">
             <thead>
               <tr>
                 <th></th>
+                <th>SKU</th>
                 <th>Product</th>
                 <th>Price</th>
                 <th>Quantity</th>
@@ -36,6 +42,7 @@
     <p>No image</p>
   @endif
           </td>
+          <td>{{ $product->sku }}</td>
           <td>{{ $product->name }}</td>
           <td>{{ $product->price }}</td>
           <td>{{ $product->quantity }}</td>
@@ -52,6 +59,7 @@
       @endforelse
             </tbody>
           </table>
+          </div>
         </div>
       </div>
     </div>
@@ -92,15 +100,18 @@
 
           <!-- Checkout Section -->
           <div class="mt-3">
-            <h4>Total: {{ array_sum(array_column($cart, 'subtotal')) }}</h4>
+            <h4>SubTotal: {{ array_sum(array_column($cart, 'subtotal')) }}</h4>
+
+            <!-- Tax and Discount Fields -->
             <div class="form-group">
               <label for="tax">Tax (%)</label>
-              <input type="number" id="tax" class="form-control" min="0" value="0">
+              <input type="number" id="tax" class="form-control" min="0" value="{{ $settings->tax }}" readonly>
             </div>
 
             <div class="form-group">
               <label for="discount">Discount (%)</label>
-              <input type="number" id="discount" class="form-control" min="0" value="0">
+              <input type="number" id="discount" class="form-control" min="0" value="{{ $settings->discount }}"
+                readonly>
             </div>
 
             <div class="card-body">
@@ -114,7 +125,6 @@
           @endforeach
                 </select>
               </div>
-
 
               <div class="form-group">
                 <label for="charge">Customer Payment</label>
@@ -130,7 +140,11 @@
                 </select>
               </div>
 
-              <button id="checkout-btn" class="btn btn-success btn-block">Checkout</button>
+              <!-- Review Invoice Button -->
+              <button id="review-invoice-btn" class="btn btn-info btn-block mt-3">Review Invoice</button>
+
+              <!-- Checkout Button -->
+              <button id="checkout-btn" class="btn btn-success btn-block mt-3">Checkout</button>
             </div>
           </div>
         </div>
@@ -165,15 +179,47 @@
       });
     });
 
+    // Review Invoice Functionality
+    document.getElementById('review-invoice-btn').addEventListener('click', function () {
+      const tax = document.getElementById('tax').value;
+      const discount = document.getElementById('discount').value;
+      const charge = document.getElementById('charge').value;
+      const paymentMode = document.getElementById('payment_mode').value;
+      const customerId = document.getElementById('customer_id').value;
+
+      fetch('pos.invoice-preview', {
+        method: 'POST',
+        headers: {
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          tax: tax,
+          discount: discount,
+          charge: charge,
+          payment_mode: paymentMode,
+          customer_id: customerId
+        })
+      }).then(response => response.json())
+        .then(data => {
+          if (data.error) {
+            alert(data.error);
+          } else {
+            // Redirect to the invoice preview page
+            window.location.href = 'pos.invoice-preview';
+            // Adjust if you're displaying in a modal instead
+          }
+        })
+        .catch(error => console.error('Error:', error));
+    });
+
     // Checkout Functionality
     document.getElementById('checkout-btn').addEventListener('click', function () {
       const tax = document.getElementById('tax').value;
       const discount = document.getElementById('discount').value;
       const charge = document.getElementById('charge').value;
       const paymentMode = document.getElementById('payment_mode').value;
-      const customerId = document.getElementById('customer_id').value; // new
-
-      // console.log('Selected Customer ID:', customerId);
+      const customerId = document.getElementById('customer_id').value;
 
       fetch('/pos/checkout', {
         method: 'POST',
@@ -186,7 +232,7 @@
           discount: discount,
           charge: charge,
           payment_mode: paymentMode,
-          customer_id: customerId // new
+          customer_id: customerId
         })
       }).then(response => response.json())
         .then(data => {
@@ -199,5 +245,4 @@
         });
     });
   </script>
-
   @endsection

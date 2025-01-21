@@ -7,51 +7,47 @@
 <div>
   <!-- Search Form -->
   <form method="GET" action="{{ route('categories.index') }}" class="mb-3">
-    <input 
-      type="text" 
-      name="search" 
-      class="form-control" 
-      placeholder="Search categories..." 
-      value="{{ $search ?? '' }}"  
-    >
+    <input type="text" name="search" class="form-control" placeholder="Search categories..."
+      value="{{ $search ?? '' }}">
   </form>
-
-  <table class="table table-bordered">
-    <thead>
+  <div style="overflow-x:auto;">
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Description</th>
+          <th>Edit</th>
+          <th>Delete</th>
+        </tr>
+      </thead>
+      <tbody>
+        @forelse($categories as $category)
       <tr>
-        <th>Name</th>
-        <th>Description</th>
-        <th>Edit</th>
-        <th>Delete</th>
-      </tr>
-    </thead>
-    <tbody>
-      @forelse($categories as $category)
-      <tr>
-      <td>{{ $category->name }}</td>
-      <td>{{ $category->description }}</td>
-      <td>
+        <td>{{ $category->name }}</td>
+        <td>{{ $category->description }}</td>
+        <td>
         <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal"
-        data-bs-target="#editCategoryModal" data-id="{{ $category->category_id }}" data-name="{{ $category->name }}"
-        data-description="{{ $category->description }}">
-        Edit
+          data-bs-target="#editCategoryModal" data-id="{{ $category->category_id }}"
+          data-name="{{ $category->name }}" data-description="{{ $category->description }}">
+          Edit
         </button>
-      </td>
-      <td>
+        </td>
+        <td>
         <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
-        data-bs-target="#deleteCategoryModal" data-id="{{ $category->category_id }}"
-        data-name="{{ $category->name }}">
-        Delete
+          data-bs-target="#deleteCategoryModal" data-id="{{ $category->category_id }}"
+          data-name="{{ $category->name }}">
+          Delete
         </button>
-      </td>
+        </td>
       </tr>
     @empty
-      <tr>
+    <tr>
       <td colspan="4">No categories available.</td>
-      </tr>
-    @endforelse
-    </tbody>
-  </table>
+    </tr>
+  @endforelse
+      </tbody>
+    </table>
+  </div>
 </div>
 
 <!-- Trigger Modal -->

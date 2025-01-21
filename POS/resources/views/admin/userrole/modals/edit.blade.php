@@ -22,6 +22,7 @@
           </div>
 
           <!-- Role -->
+          @if(auth()->user()->id !== $user->id)
           <div class="mb-3">
             <label for="edit-role" class="form-label">Role</label>
             <select id="edit-role" name="role" class="form-select" required>
@@ -29,6 +30,7 @@
               <option value="cashier">Cashier</option>
             </select>
           </div>
+          @endif
 
           <!-- Password (Optional) -->
           <div class="mb-3">

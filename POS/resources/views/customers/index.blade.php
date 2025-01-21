@@ -7,51 +7,47 @@
 <div>
   <!-- Search Form -->
   <form method="GET" action="{{ route('customers.index') }}" class="mb-3">
-    <input 
-      type="text" 
-      name="search" 
-      class="form-control" 
-      placeholder="Search customers.." 
-      value="{{ $search ?? '' }}"  
-    >
+    <input type="text" name="search" class="form-control" placeholder="Search customers.." value="{{ $search ?? '' }}">
   </form>
 
-  <table class="table table-bordered">
-    <thead>
+  <div style="overflow-x:auto;">
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Contact Number</th>
+          <th>Edit</th>
+          <th>Delete</th>
+        </tr>
+      </thead>
+      <tbody>
+        @forelse($customers as $customer)
       <tr>
-        <th>Name</th>
-        <th>Contact Number</th>
-        <th>Edit</th>
-        <th>Delete</th>
-      </tr>
-    </thead>
-    <tbody>
-      @forelse($customers as $customer)
-      <tr>
-      <td>{{ $customer->name }}</td>
-      <td>{{ $customer->contact_number }}</td>
-      <td>
+        <td>{{ $customer->name }}</td>
+        <td>{{ $customer->contact_number }}</td>
+        <td>
         <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal"
-        data-bs-target="#editCustomerModal" data-id="{{ $customer->customer_id }}" data-name="{{ $customer->name }}"
-        data-contact_number="{{ $customer->contact_number }}">
-        Edit
+          data-bs-target="#editCustomerModal" data-id="{{ $customer->customer_id }}"
+          data-name="{{ $customer->name }}" data-contact_number="{{ $customer->contact_number }}">
+          Edit
         </button>
-      </td>
-      <td>
+        </td>
+        <td>
         <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
-        data-bs-target="#deleteCustomerModal" data-id="{{ $customer->customer_id }}"
-        data-name="{{ $customer->name }}">
-        Delete
+          data-bs-target="#deleteCustomerModal" data-id="{{ $customer->customer_id }}"
+          data-name="{{ $customer->name }}">
+          Delete
         </button>
-      </td>
+        </td>
       </tr>
     @empty
-      <tr>
+    <tr>
       <td colspan="4">No customers available.</td>
-      </tr>
-    @endforelse
-    </tbody>
-  </table>
+    </tr>
+  @endforelse
+      </tbody>
+    </table>
+  </div>
 </div>
 
 <!-- Trigger Modal -->

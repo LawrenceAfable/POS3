@@ -8,10 +8,6 @@ use DB;
 
 class SaleManagementController extends Controller
 {
-    public function index1()
-    {
-        return view('sales.index');
-    }
 
     public function index()
     {

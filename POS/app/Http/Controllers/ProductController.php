@@ -9,7 +9,7 @@ use App\Models\Supplier;
 
 class ProductController extends Controller
 {
-    public function index(Request $request)
+    public function index1(Request $request)
     {
         $search = $request->input('search'); // Get the search input
 
@@ -25,8 +25,7 @@ class ProductController extends Controller
                         $query->where('name', 'like', "%{$search}%")
                             ->orWhere('email', 'like', "%{$search}%");
                     });
-            })
-            ->get(); // Fetch filtered products
+            })->get(); // Fetch filtered products
 
         $categories = Category::all(); // Fetch all categories
         $suppliers = Supplier::all(); // Fetch all suppliers
@@ -38,6 +37,86 @@ class ProductController extends Controller
             'search' => $search, // Pass the search term back to the view
         ]);
     }
+
+    public function index2(Request $request)
+    {
+        $search = $request->input('search');
+        $selectedCategoryId = $request->input('category_id');
+
+        // Get all categories for the dropdown
+        $categories = Category::all();
+        $suppliers = Supplier::all();
+
+        // Filter products based on search and selected category
+        $products = Product::with(['category', 'supplier'])
+            ->where('name', 'like', "%{$search}%")
+            ->orWhere('description', 'like', "%{$search}%")
+            ->orWhere('sku', 'like', "%{$search}%")
+            ->orWhereHas('category', function ($query) use ($search) {
+                $query->where('name', 'like', "%{$search}%");
+            })
+            ->orWhereHas('supplier', function ($query) use ($search) {
+                $query->where('name', 'like', "%{$search}%");
+            })
+            ->when($selectedCategoryId, function ($query) use ($selectedCategoryId) {
+                return $query->where('category_id', $selectedCategoryId);
+            })
+            ->get();
+
+        return view("products.index", [
+            'products' => $products,
+            'categories' => $categories,
+            'suppliers' => $suppliers,
+            'search' => $search, // Pass the search term back to the view
+            'selectedCategoryId' => $selectedCategoryId, // Pass the selected category ID to the view
+        ]);
+    }
+
+    public function index(Request $request)
+    {
+        $search = $request->input('search');
+        $selectedCategoryId = $request->input('category_id');
+
+        // Get all categories for the dropdown
+        $categories = Category::all();
+        $suppliers = Supplier::all();
+
+        // Initialize the query
+        $query = Product::with(['category', 'supplier']);
+
+        // Apply the search filter (if search term exists)
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%")
+                    ->orWhere('sku', 'like', "%{$search}%")
+                    ->orWhereHas('category', function ($q) use ($search) {
+                        $q->where('name', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('supplier', function ($q) use ($search) {
+                        $q->where('name', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        // Apply category filter (if category is selected)
+        if ($selectedCategoryId) {
+            $query->where('category_id', $selectedCategoryId);
+        }
+
+        // Get filtered products
+        $products = $query->get();
+
+        // Return the view with the products and filters
+        return view("products.index", [
+            'products' => $products,
+            'categories' => $categories,
+            'suppliers' => $suppliers,
+            'search' => $search,
+            'selectedCategoryId' => $selectedCategoryId,
+        ]);
+    }
+
 
 
 

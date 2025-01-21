@@ -5,73 +5,77 @@
 
 @section('content')
 <div>
-  <!-- Search Form -->
+  <!-- Search and Category Filter Form -->
   <form method="GET" action="{{ route('products.index') }}" class="mb-3">
-    <input 
-      type="text" 
-      name="search" 
-      class="form-control" 
-      placeholder="Search products.." 
-      value="{{ $search ?? '' }}"  
-    >
+    <div class="row">
+      <div class="col-md-8">
+        <input type="text" name="search" class="form-control" placeholder="Search products..."
+          value="{{ $search ?? '' }}">
+      </div>
+      <div class="col-md-4">
+        <select name="category_id" class="form-control">
+          <option value="">All Categories</option>
+          @foreach($categories as $category)
+        <option value="{{ $category->category_id }}" {{ $category->category_id == $selectedCategoryId ? 'selected' : '' }}>
+        {{ $category->name }}
+        </option>
+      @endforeach
+        </select>
+      </div>
+    </div>
+    <button type="submit" class="btn btn-primary mt-3">Filter</button>
   </form>
-  
-  <table class="table table-bordered">
-    <thead>
+
+
+  <!-- Table Container for Horizontal Scrolling -->
+  <div style="overflow-x:auto;">
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th>SKU</th>
+          <th>Name</th>
+          <th>Description</th>
+          <th>Category</th>
+          <th>Supplier</th>
+          <th>Price</th>
+          <th>Quantity</th>
+          <th>View</th>
+          <th>Edit</th>
+          <th>Delete</th>
+        </tr>
+      </thead>
+      <tbody>
+        @forelse($products as $product)
       <tr>
-        <th>SKU</th>
-        <th>Name</th>
-        <th>Description</th>
-        <th>Category</th>
-        <th>Supplier</th>
-        <th>Price</th>
-        <th>Quantity</th>
-        <th>View</th>
-        <th>Edit</th>
-        <th>Delete</th>
-      </tr>
-    </thead>
-    <tbody>
-      @forelse($products as $product)
-      <tr>
-      <td>{{ $product->sku }}</td>
-      <td>{{ $product->name }}</td>
-      <td>{{ $product->description }}</td>
-      <td>{{ $product->category->name ?? 'N/A' }}</td>
-      <td>{{ $product->supplier->name ?? 'N/A' }}</td>
-      <td>{{ $product->price }}</td>
-      <td>{{ $product->quantity }}
+        <td>{{ $product->sku }}</td>
+        <td>{{ $product->name }}</td>
+        <td>{{ $product->description }}</td>
+        <td>{{ $product->category->name ?? 'N/A' }}</td>
+        <td>{{ $product->supplier->name ?? 'N/A' }}</td>
+        <td>{{ $product->price }}</td>
+        <td>{{ $product->quantity }}
         @if($product->quantity < $product->low_stock_threshold)
       <span class="text-danger">Low Stock</span>
     @endif
-      </td>
-      <td>
-        <!-- View button to redirect to the product view page -->
-        <a href="{{ route('products.view', $product->product_id) }}" class="btn btn-info">View</a>
-      </td>
-      <td>
-        <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editProductModal"
-        data-id="{{ $product->product_id }}" data-sku="{{$product->sku}}" data-name="{{ $product->name }}"
-        data-description="{{ $product->description }}" data-category="{{ $product->category_id }}"
-        data-supplier="{{ $product->supplier_id }}" data-price="{{ $product->price }}"
-        data-quantity="{{ $product->quantity }}">
-        Edit
-        </button>
-      </td>
-      <td>
-        <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
-        data-bs-target="#deleteProductModal" data-id="{{ $product->product_id }}" data-name="{{ $product->name }}">
-        Delete
-        </button>
-      </td>
+        </td>
+        <td><a href="{{ route('products.view', $product->product_id) }}" class="btn btn-info">View</a></td>
+        <td><button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal"
+          data-bs-target="#editProductModal" data-id="{{ $product->product_id }}" data-sku="{{ $product->sku }}"
+          data-name="{{ $product->name }}" data-description="{{ $product->description }}"
+          data-category="{{ $product->category_id }}" data-supplier="{{ $product->supplier_id }}"
+          data-price="{{ $product->price }}" data-quantity="{{ $product->quantity }}">Edit</button></td>
+        <td><button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
+          data-bs-target="#deleteProductModal" data-id="{{ $product->product_id }}"
+          data-name="{{ $product->name }}">Delete</button></td>
       </tr>
     @empty
-      <tr>
-      <td colspan="8">No products available.</td>
-      </tr>
-    @endforelse
-    </tbody>
-  </table>
+    <tr>
+      <td colspan="10">No products available.</td>
+    </tr>
+  @endforelse
+      </tbody>
+    </table>
+  </div>
 </div>
 
 <!-- Add Product Button -->
@@ -87,6 +91,7 @@
 @include('products.modals.delete')
 
 @endsection
+
 
 <!-- Dynamic Modal Script -->
 <script>

@@ -5,58 +5,54 @@
 
 @section('content')
 <div>
-   <!-- Search Form -->
-   <form method="GET" action="{{ route('suppliers.index') }}" class="mb-3">
-    <input 
-      type="text" 
-      name="search" 
-      class="form-control" 
-      placeholder="Search suppliers..." 
-      value="{{ $search ?? '' }}"  
-    >
+  <!-- Search Form -->
+  <form method="GET" action="{{ route('suppliers.index') }}" class="mb-3">
+    <input type="text" name="search" class="form-control" placeholder="Search suppliers..." value="{{ $search ?? '' }}">
   </form>
 
-  <table class="table table-bordered">
-    <thead>
+  <div style="overflow-x:auto;">
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Phone</th>
+          <th>Address</th>
+          <th>Edit</th>
+          <th>Delete</th>
+        </tr>
+      </thead>
+      <tbody>
+        @forelse($suppliers as $supplier)
       <tr>
-        <th>Name</th>
-        <th>Email</th>
-        <th>Phone</th>
-        <th>Address</th>
-        <th>Edit</th>
-        <th>Delete</th>
-      </tr>
-    </thead>
-    <tbody>
-      @forelse($suppliers as $supplier)
-      <tr>
-      <td>{{ $supplier->name }}</td>
-      <td>{{ $supplier->email }}</td>
-      <td>{{ $supplier->phone }}</td>
-      <td>{{ $supplier->address }}</td>
-      <td>
+        <td>{{ $supplier->name }}</td>
+        <td>{{ $supplier->email }}</td>
+        <td>{{ $supplier->phone }}</td>
+        <td>{{ $supplier->address }}</td>
+        <td>
         <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal"
-        data-bs-target="#editSupplierModal" data-id="{{ $supplier->supplier_id }}" data-name="{{ $supplier->name }}"
-        data-email="{{ $supplier->email }}" data-phone="{{ $supplier->phone }}"
-        data-address="{{ $supplier->address }}">
-        Edit
+          data-bs-target="#editSupplierModal" data-id="{{ $supplier->supplier_id }}"
+          data-name="{{ $supplier->name }}" data-email="{{ $supplier->email }}" data-phone="{{ $supplier->phone }}"
+          data-address="{{ $supplier->address }}">
+          Edit
         </button>
-      </td>
-      <td>
+        </td>
+        <td>
         <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
-        data-bs-target="#deleteSupplierModal" data-id="{{ $supplier->supplier_id }}"
-        data-name="{{ $supplier->name }}">
-        Delete
+          data-bs-target="#deleteSupplierModal" data-id="{{ $supplier->supplier_id }}"
+          data-name="{{ $supplier->name }}">
+          Delete
         </button>
-      </td>
+        </td>
       </tr>
     @empty
-      <tr>
+    <tr>
       <td colspan="7">No suppliers available.</td>
-      </tr>
-    @endforelse
-    </tbody>
-  </table>
+    </tr>
+  @endforelse
+      </tbody>
+    </table>
+  </div>
 </div>
 
 <!-- Trigger Modal -->

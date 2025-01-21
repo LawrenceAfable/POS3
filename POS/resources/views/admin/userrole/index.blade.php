@@ -4,65 +4,55 @@
 @section('page-title', 'Users List')
 
 @section('content')
+@include('components.alert')
 <div>
   <!-- Search Form -->
   <form method="GET" action="{{ route('admin.userrole.index') }}" class="mb-3">
-    <input 
-      type="text" 
-      name="search" 
-      class="form-control" 
-      placeholder="Search users.." 
-      value="{{ $search ?? '' }}"  
-    >
+    <input type="text" name="search" class="form-control" placeholder="Search users.." value="{{ $search ?? '' }}">
   </form>
 
-  <!-- Users Table -->
-  <table class="table table-bordered">
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Email</th>
-        <th>Role</th>
-        <th>Edit</th>
-        <th>Delete</th>
-      </tr>
-    </thead>
-    <tbody>
-      @forelse($users as $user)
+  <div style="overflow-x:auto;">
+    <!-- Users Table -->
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Role</th>
+          <th>Edit</th>
+          <th>Delete</th>
+        </tr>
+      </thead>
+      <tbody>
+        @forelse($users as $user)
       <tr>
         <td>{{ $user->name }}</td>
         <td>{{ $user->email }}</td>
         <td>{{ ucfirst($user->role) }}</td>
         <td>
-          <button type="button" class="btn btn-warning btn-sm" 
-                  data-bs-toggle="modal" 
-                  data-bs-target="#editUserModal" 
-                  data-id="{{ $user->id }}" 
-                  data-name="{{ $user->name }}"
-                  data-email="{{ $user->email }}" 
-                  data-role="{{ $user->role }}">
-            Edit
-          </button>
+        <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editUserModal"
+          data-id="{{ $user->id }}" data-name="{{ $user->name }}" data-email="{{ $user->email }}"
+          data-role="{{ $user->role }}">
+          Edit
+        </button>
         </td>
         <td>
-          @if(auth()->user()->id !== $user->id) {{-- Prevent self-deletion --}}
-          <button type="button" class="btn btn-danger btn-sm" 
-                  data-bs-toggle="modal" 
-                  data-bs-target="#deleteUserModal" 
-                  data-id="{{ $user->id }}" 
-                  data-name="{{ $user->name }}">
-            Delete
-          </button>
-          @endif
+        @if(auth()->user()->id !== $user->id) {{-- Prevent self-deletion --}}
+      <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteUserModal"
+        data-id="{{ $user->id }}" data-name="{{ $user->name }}">
+        Delete
+      </button>
+    @endif
         </td>
       </tr>
-      @empty
-      <tr>
-        <td colspan="5">No users available.</td>
-      </tr>
-      @endforelse
-    </tbody>
-  </table>
+    @empty
+    <tr>
+      <td colspan="5">No users available.</td>
+    </tr>
+  @endforelse
+      </tbody>
+    </table>
+  </div>
 </div>
 
 <!-- Add User Button -->
