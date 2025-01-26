@@ -15,4 +15,9 @@ class Category extends Model
 
     public $incrementing = true; // Ensure it's an auto-incrementing key
     protected $keyType = 'int';  // Ensure the primary key is an integer
+
+    public function products()
+    {
+        return $this->hasMany(Product::class, 'category_id', 'category_id');
+    }
 }

@@ -11,6 +11,11 @@
     <input type="text" name="search" class="form-control" placeholder="Search users.." value="{{ $search ?? '' }}">
   </form>
 
+  <!-- Add User Button -->
+  <div>
+    <a href="{{ route('admin.userrole.modals.add') }}" class="btn btn-success my-2">+</a>
+  </div>
+
   <div style="overflow-x:auto;">
     <!-- Users Table -->
     <table class="table table-bordered">
@@ -19,8 +24,8 @@
           <th>Name</th>
           <th>Email</th>
           <th>Role</th>
-          <th>Edit</th>
-          <th>Delete</th>
+          <th>Status</th>
+          <th>Action</th>
         </tr>
       </thead>
       <tbody>
@@ -29,20 +34,26 @@
         <td>{{ $user->name }}</td>
         <td>{{ $user->email }}</td>
         <td>{{ ucfirst($user->role) }}</td>
-        <td>
-        <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editUserModal"
-          data-id="{{ $user->id }}" data-name="{{ $user->name }}" data-email="{{ $user->email }}"
-          data-role="{{ $user->role }}">
-          Edit
-        </button>
+        <td style="color: {{ $user->status == 0 ? 'green' : 'red' }};">
+        {{ $user->status == 0 ? 'Active' : 'Inactive' }}
         </td>
         <td>
-        @if(auth()->user()->id !== $user->id) {{-- Prevent self-deletion --}}
-      <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteUserModal"
-        data-id="{{ $user->id }}" data-name="{{ $user->name }}">
-        Delete
-      </button>
-    @endif
+        <div class="d-flex gap-2">
+          <!-- Edit Button -->
+          <form action="{{ route('admin.userrole.modals.edit', $user->id) }}" method="GET">
+          <button type="submit" class="btn btn-warning btn-sm">Edit</button>
+          </form>
+
+          <!-- Delete Button -->
+          @if(auth()->user()->id !== $user->id) {{-- Prevent self-deletion --}}
+        <form action="{{ route('users.destroy', $user->id) }}" method="POST"
+        onsubmit="return confirm('Are you sure you want to delete this user?');">
+        @csrf
+        @method('DELETE')
+        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+        </form>
+      @endif
+        </div>
         </td>
       </tr>
     @empty
@@ -55,66 +66,9 @@
   </div>
 </div>
 
-<!-- Add User Button -->
+<!-- Pagination Links -->
 <div>
-  <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addUserModal">
-    Add a New User
-  </button>
+  {{ $users->appends(['search' => $search])->links('pagination::bootstrap-5') }}
 </div>
 
-<!-- Include Modals -->
-@include('admin.userrole.modals.add')
-@include('admin.userrole.modals.edit')
-@include('admin.userrole.modals.delete')
 @endsection
-
-<!-- JavaScript for Modals -->
-<script>
-  document.addEventListener('DOMContentLoaded', function () {
-    // Edit Modal Logic
-    const editUserModal = document.getElementById('editUserModal');
-    const editForm = document.getElementById('editUserForm');
-    const editNameInput = document.getElementById('edit-name');
-    const editEmailInput = document.getElementById('edit-email');
-    const editRoleSelect = document.getElementById('edit-role');
-    const editPasswordInput = document.getElementById('edit-password');
-    const editPasswordConfirmInput = document.getElementById('edit-password-confirm');
-
-    editUserModal.addEventListener('show.bs.modal', function (event) {
-      const button = event.relatedTarget;
-      const userId = button.getAttribute('data-id');
-      const userName = button.getAttribute('data-name');
-      const userEmail = button.getAttribute('data-email');
-      const userRole = button.getAttribute('data-role');
-
-      // Set form action dynamically
-      editForm.action = `/user/${button.getAttribute('data-id')}/update`;
-      // editForm.action = `/user/${button.getAttribute('data-id')}/update`;
-
-
-      // Populate form fields
-      editNameInput.value = userName;
-      editEmailInput.value = userEmail;
-      editRoleSelect.value = userRole;
-
-      // Clear password fields on modal open
-      editPasswordInput.value = '';
-      editPasswordConfirmInput.value = '';
-    });
-
-    // Delete Modal Logic
-    const deleteUserModal = document.getElementById('deleteUserModal');
-    const deleteForm = document.getElementById('deleteUserForm');
-    const deleteUserName = document.getElementById('delete-user-name');
-
-    deleteUserModal.addEventListener('show.bs.modal', function (event) {
-      const button = event.relatedTarget;
-      const userId = button.getAttribute('data-id');
-      const userName = button.getAttribute('data-name');
-
-      // Set form action for deletion
-      deleteForm.action = "{{ url('/user') }}/" + button.getAttribute('data-id') + "/destroy";
-      deleteUserName.textContent = userName;
-    });
-  });
-</script>

@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('email')->unique(); // Unique email
             $table->string('phone')->nullable(); // Phone number
             $table->text('address')->nullable(); // Address
+            $table->tinyInteger('status')->default(0); // Use tinyInteger for status (0 = Active, 1 = Inactive)
             $table->timestamps(); // Timestamps for created_at and updated_at
         });
     }

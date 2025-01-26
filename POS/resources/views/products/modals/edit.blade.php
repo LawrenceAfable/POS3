@@ -62,7 +62,7 @@
           <div class="mb-3">
             <label for="edit-quantity" class="form-label">Quantity</label>
             <input type="number" id="edit-quantity" class="form-control" name="quantity" placeholder="Quantity"
-              required>
+            readonly>
           </div>
 
           <div class="mb-3">

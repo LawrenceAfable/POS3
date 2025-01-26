@@ -1,6 +1,8 @@
 <?php
 
 
+use App\Http\Controllers\GenerateReportController;
+use App\Http\Controllers\StockManagementController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\SupplierController;
@@ -67,7 +69,6 @@ Route::middleware(['auth'])->group(function () { // change the auth to ['auth', 
         Route::put('/supplier/{supplier}/update', [SupplierController::class, 'update'])->name('suppliers.update');
         Route::delete('/supplier/{supplier}/destroy', [SupplierController::class, 'destroy'])->name('suppliers.destroy');
 
-
         // Products
         Route::get('products/{product_id}/view', [ProductController::class, 'show'])->name('products.view');
         Route::get('/product', [ProductController::class, 'index'])->name('products.index');
@@ -82,6 +83,11 @@ Route::middleware(['auth'])->group(function () { // change the auth to ['auth', 
         Route::delete('/customer/{customer}/destroy', [CustomerController::class, 'destroy'])->name('customers.destroy');
 
         // User Management
+        Route::get('/user-create', [UserManagementController::class, 'add'])->name('admin.userrole.modals.add');
+        Route::get('/user-edit/{id}', [UserManagementController::class, 'edit'])->name('admin.userrole.modals.edit'); // Add {id} parameter
+        Route::get('/user-edit', [UserManagementController::class, 'edit'])->name('admins.userrole.modals.edit');
+
+        // ORIGINAL
         Route::get('/user-dashboard', [UserManagementController::class, 'index'])->name('admin.userrole.index');
         Route::post('/user-add', [UserManagementController::class, 'store'])->name('users.store');
         Route::put('/user/{id}/update', [UserManagementController::class, 'update'])->name('users.update');
@@ -89,13 +95,25 @@ Route::middleware(['auth'])->group(function () { // change the auth to ['auth', 
 
         // Sales Transaction
         Route::get('/sales-transaction', [SaleManagementController::class, 'index'])->name('sales.index');
+        Route::get('sales/{order_id}/view', [SaleManagementController::class, 'view'])->name('sales.view');
 
         // Setting
         Route::get('/setting', [SettingController::class, 'index'])->name('settings.index');
         Route::put('/settings', [SettingController::class, 'update'])->name('settings.update');
 
         // Invoice
-        Route::post('/pos/invoice-preview', [POSController::class, 'generateInvoicePreview'])->name('pos.invoice-preview');
+        Route::post('/pos/preview', [POSController::class, 'showPreview'])->name('showPreview');
+
+        // Generate Report
+        Route::get('/product-report/{search?}/{category_id?}/{quantity_filter?}/{sort?}', [GenerateReportController::class, 'productReport'])
+            ->name('productReport');
+        Route::get('/sale-transaction-report/{start_date?}/{end_date?}', [GenerateReportController::class, 'saleTransactionReport'])
+            ->name('saleTransactionReport');
+        Route::get('/sale-report/{order_id}', [GenerateReportController::class, 'saleReport'])
+            ->name('saleReport');
+        // Stocks Management
+        Route::get('/stock', [StockManagementController::class, 'index'])->name('stocks.index');
+        Route::post('/stock/restock', [StockManagementController::class, 'restock'])->name('stocks.restock');
 
     });
 });

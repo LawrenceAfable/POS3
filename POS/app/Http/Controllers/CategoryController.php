@@ -16,7 +16,8 @@ class CategoryController extends Controller
                 $query->where('name', 'like', "%{$search}%")
                     ->orWhere('description', 'like', "%{$search}%");
             })
-            ->get(); // Fetch filtered categories
+            ->withCount('products')
+            ->paginate(2); // Fetch filtered categories
 
         return view('categories.index', [
             'categories' => $categories,

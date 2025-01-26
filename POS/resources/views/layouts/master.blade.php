@@ -17,7 +17,7 @@
   <!-- Custom CSS -->
   <link href="{{ asset('css/app.css') }}" rel="stylesheet">
 
-  <style>
+  <!-- <style>
     /* Reset Box Model */
     * {
       box-sizing: border-box;
@@ -114,7 +114,180 @@
         padding: 10px;
       }
     }
+  </style> -->
+
+  <style>
+    /* Reset Box Model */
+    * {
+      box-sizing: border-box;
+    }
+
+    /* Navbar Styling */
+    .navbar {
+      background-color: #0d1b2a !important;
+      /* Navy Blue */
+      border-bottom: 1px solid #0d1b2a !important;
+    }
+
+    .navbar-brand {
+      font-weight: bold;
+      font-size: 1.8rem;
+      color: #ffffff !important;
+      /* White text for brand */
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      font-style: italic;
+    }
+
+    .navbar-brand:hover {
+      color: #ffa500 !important;
+      /* Orange hover for brand */
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+    }
+
+    .navbar-nav .nav-link {
+      color: #ffffff !important;
+      /* White text for links */
+    }
+
+    .navbar-nav .nav-link:hover {
+      color: #ffa500 !important;
+      /* Orange hover for links */
+    }
+
+    /* Sidebar Styling */
+    .sidebar {
+      background-color: #1b263b;
+      /* Navy Blue */
+      min-height: 100vh;
+      position: sticky;
+      top: 0;
+      padding-top: 20px;
+      border-right: 1px solid #1b263b;
+      transition: transform 0.3s ease-in-out;
+    }
+
+    .sidebar a {
+      color: #ffffff !important;
+      /* White text for sidebar links */
+      padding: 10px 20px;
+      display: block;
+      text-decoration: none;
+      font-weight: 500;
+      transition: background-color 0.2s ease, padding-left 0.2s ease;
+    }
+
+    .sidebar a:hover,
+    .sidebar a.active {
+      background-color: #415a77;
+      /* Darker navy blue for hover/active */
+      padding-left: 25px;
+    }
+
+    /* Main Content */
+    .main-content {
+      padding: 20px;
+      background-color: #ffffff;
+      /* White background for content */
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      margin-top: 20px;
+    }
+
+    /* Sidebar: Hide on Mobile */
+    @media (max-width: 768px) {
+      .sidebar {
+        display: none;
+        position: fixed;
+        left: 0;
+        top: 0;
+        height: 100%;
+        width: 250px;
+        background-color: #001f3f;
+        /* Navy Blue */
+        z-index: 1000;
+      }
+
+      .sidebar.active {
+        display: block;
+        transform: translateX(0);
+      }
+
+      .sidebar:not(.active) {
+        transform: translateX(-100%);
+      }
+    }
+
+    /* Sidebar Overlay */
+    #sidebarOverlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 999;
+    }
+
+    /* Main Content: Responsive Padding */
+    @media (max-width: 576px) {
+      .main-content {
+        margin-top: 10px;
+        padding: 10px;
+      }
+    }
+
+    /* Buttons and Accents */
+    .btn-primary {
+      background-color: #1b263b;
+      /* Navy Blue */
+      border-color: #1b263b;
+      color: #ffffff !important;
+      /* White text for buttons */
+    }
+
+    .btn-primary:hover {
+      background-color: #003366;
+      /* Darker navy blue */
+      border-color: #00284d;
+    }
+
+    .btn-secondary {
+      background-color: #ffa500;
+      /* Orange for secondary buttons */
+      border-color: #e69500;
+      color: #ffffff !important;
+      /* White text for buttons */
+    }
+
+    .btn-secondary:hover {
+      background-color: #e69500;
+      /* Darker orange */
+      border-color: #cc8400;
+    }
+
+    /* Table Styling */
+    .table {
+      width: 100%;
+      margin-bottom: 1rem;
+      color: #212529;
+    }
+
+    .table thead th {
+      background-color: #1b263b;
+      /* Navy Blue */
+      color: #ffffff !important;
+      /* White text for table headers */
+      border-bottom: 2px solid #1b263b;
+    }
+
+    .table tbody tr:hover {
+      background-color: #f1f1f1;
+      /* Light gray hover for rows */
+    }
   </style>
+
 </head>
 
 <body>
@@ -140,15 +313,12 @@
       <!-- Main Content -->
       <main class="col-md-9 col-lg-10 py-4">
         <div class="main-content">
-          <h1 class="mb-4">@yield('page-title', 'Default Page Title')</h1>
+          <h5 class="mb-4">@yield('page-title', 'Default Page Title')</h5>
           @yield('content')
         </div>
       </main>
     </div>
   </div>
-
-  <!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
-
 
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>

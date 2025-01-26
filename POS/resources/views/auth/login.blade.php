@@ -36,7 +36,7 @@
 
           <div class="d-flex justify-content-between align-items-center">
             <button type="submit" class="btn btn-primary">Login</button>
-            <a href="registration" class="btn btn-link">Register here!</a>
+            <!-- <a href="registration" class="btn btn-link">Register here!</a> -->
           </div>
         </form>
       </div>

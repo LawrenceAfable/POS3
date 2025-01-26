@@ -1,5 +1,6 @@
 <!-- Modal for Editing Supplier -->
-<div class="modal fade" id="editSupplierModal" tabindex="-1" aria-labelledby="editSupplierModalLabel" aria-hidden="true">
+<div class="modal fade" id="editSupplierModal" tabindex="-1" aria-labelledby="editSupplierModalLabel"
+  aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
@@ -10,6 +11,16 @@
         <form id="editSupplierForm" method="POST">
           @csrf
           @method('PUT')
+
+          <div class="mb-3">
+            <label for="edit-status" class="form-label">Status</label>
+            <select id="edit-status" class="form-select" name="status" required>
+              <option value="">Select Status</option>
+              <option value="0" {{ $supplier->status == 0 ? 'selected' : '' }}>Active</option>
+              <option value="1" {{ $supplier->status == 1 ? 'selected' : '' }}>Inactive</option>
+            </select>
+          </div>
+
           <div class="mb-3">
             <label for="edit-name" class="form-label">Name</label>
             <input type="text" class="form-control" id="edit-name" name="name" required>

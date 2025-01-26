@@ -61,6 +61,12 @@
       </a>
     </li>
 
+    <li class="nav-item mb-2">
+      <a class="nav-link d-flex align-items-center text-dark px-3 py-2 rounded hover-effect"
+      href="{{route('stocks.index')}}">
+      <i class="bi bi-database me-2"></i> Stocks
+      </a>
+    </li> 
 
     <li class="nav-item mb-2">
       <a class="nav-link d-flex align-items-center text-dark px-3 py-2 rounded hover-effect"

@@ -21,6 +21,7 @@ class SampleSeeder extends Seeder
             'email' => 'hugocorp@gmail.com',
             'phone' => '09106401174',
             'address' => '123 Supplier St., City, Country',
+            'status' => 0, // Active
         ]);
 
         Supplier::create([
@@ -28,6 +29,7 @@ class SampleSeeder extends Seeder
             'email' => 'contact@sierra.com',
             'phone' => '09105543321',
             'address' => '456 Trade Blvd., City, Country',
+            'status' => 0, // Active
         ]);
 
         // Adding Categories
@@ -52,6 +54,8 @@ class SampleSeeder extends Seeder
             'supplier_id' => 1,  // Assuming Supplier 'Hugo Lee' has ID 1
             'sku' => '001',
             'low_stock_threshold' => 10,
+            'created_by' => 1, // Admin user ID
+            'updated_by' => 1, // Admin user ID
         ]);
 
         Product::create([
@@ -64,6 +68,8 @@ class SampleSeeder extends Seeder
             'supplier_id' => 2,  // Assuming Supplier 'Sierra Trading' has ID 2
             'sku' => '002',
             'low_stock_threshold' => 30,
+            'created_by' => 1, // Admin user ID
+            'updated_by' => 1, // Admin user ID
         ]);
 
         // Adding Customers

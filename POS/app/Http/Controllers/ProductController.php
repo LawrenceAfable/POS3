@@ -9,75 +9,14 @@ use App\Models\Supplier;
 
 class ProductController extends Controller
 {
-    public function index1(Request $request)
-    {
-        $search = $request->input('search'); // Get the search input
-
-        $products = Product::query()
-            ->when($search, function ($query, $search) {
-                $query->where('name', 'like', "%{$search}%")
-                    ->orWhere('description', 'like', "%{$search}%")
-                    ->orWhere('sku', 'like', "%{$search}%")
-                    ->orWhereHas('category', function ($query) use ($search) {
-                        $query->where('name', 'like', "%{$search}%");
-                    })
-                    ->orWhereHas('supplier', function ($query) use ($search) {
-                        $query->where('name', 'like', "%{$search}%")
-                            ->orWhere('email', 'like', "%{$search}%");
-                    });
-            })->get(); // Fetch filtered products
-
-        $categories = Category::all(); // Fetch all categories
-        $suppliers = Supplier::all(); // Fetch all suppliers
-
-        return view("products.index", [
-            'products' => $products,
-            'categories' => $categories,
-            'suppliers' => $suppliers,
-            'search' => $search, // Pass the search term back to the view
-        ]);
-    }
-
-    public function index2(Request $request)
-    {
-        $search = $request->input('search');
-        $selectedCategoryId = $request->input('category_id');
-
-        // Get all categories for the dropdown
-        $categories = Category::all();
-        $suppliers = Supplier::all();
-
-        // Filter products based on search and selected category
-        $products = Product::with(['category', 'supplier'])
-            ->where('name', 'like', "%{$search}%")
-            ->orWhere('description', 'like', "%{$search}%")
-            ->orWhere('sku', 'like', "%{$search}%")
-            ->orWhereHas('category', function ($query) use ($search) {
-                $query->where('name', 'like', "%{$search}%");
-            })
-            ->orWhereHas('supplier', function ($query) use ($search) {
-                $query->where('name', 'like', "%{$search}%");
-            })
-            ->when($selectedCategoryId, function ($query) use ($selectedCategoryId) {
-                return $query->where('category_id', $selectedCategoryId);
-            })
-            ->get();
-
-        return view("products.index", [
-            'products' => $products,
-            'categories' => $categories,
-            'suppliers' => $suppliers,
-            'search' => $search, // Pass the search term back to the view
-            'selectedCategoryId' => $selectedCategoryId, // Pass the selected category ID to the view
-        ]);
-    }
-
     public function index(Request $request)
     {
-        $search = $request->input('search');
-        $selectedCategoryId = $request->input('category_id');
+        $search = $request->input('search'); // Filter based on search box
+        $selectedCategoryId = $request->input('category_id'); // Filter by Category
+        $sort = $request->input('sort', 'asc'); // Default to ascending
+        $quantityFilter = $request->input('quantity_filter'); // New quantity filter
 
-        // Get all categories for the dropdown
+        // Get all categories and suppliers for the dropdown
         $categories = Category::all();
         $suppliers = Supplier::all();
 
@@ -104,8 +43,20 @@ class ProductController extends Controller
             $query->where('category_id', $selectedCategoryId);
         }
 
-        // Get filtered products
-        $products = $query->get();
+        // Apply quantity filter (if quantity filter is selected)
+        if ($quantityFilter !== null) {
+            if ($quantityFilter === '0') {
+                $query->where('quantity', 0); // Filter for out-of-stock products
+            } elseif ($quantityFilter === '1') {
+                $query->where('quantity', '>', 0); // Filter for in-stock products
+            }
+        }
+
+        // Apply price sorting
+        $query->orderBy('price', $sort);
+
+        // Paginate the results (e.g., 10 items per page)
+        $products = $query->paginate(10);
 
         // Return the view with the products and filters
         return view("products.index", [
@@ -114,11 +65,10 @@ class ProductController extends Controller
             'suppliers' => $suppliers,
             'search' => $search,
             'selectedCategoryId' => $selectedCategoryId,
+            'sort' => $sort,
+            'quantityFilter' => $quantityFilter, // Pass the quantity filter to the view
         ]);
     }
-
-
-
 
     public function show($product_id)
     {
@@ -153,6 +103,7 @@ class ProductController extends Controller
             'image_url' => $imagePath,
             'quantity' => $request->quantity,
             'supplier_id' => $request->supplier_id,
+            'created_by' => auth()->id(),
         ]);
 
         return redirect()->route('products.index')->with('success', 'Product created successfully!');
@@ -166,7 +117,8 @@ class ProductController extends Controller
             'description' => 'nullable|string|max:500',
             'price' => 'required|numeric|min:0',
             'category_id' => 'nullable|exists:categories,category_id',
-            'quantity' => 'required|integer|min:0',
+         //   'quantity' => 'required|integer|min:0',
+            'quantity' => 'nullable|integer|min:0',
             'supplier_id' => 'nullable|exists:suppliers,supplier_id',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
@@ -191,6 +143,7 @@ class ProductController extends Controller
             'image_url' => $imagePath,
             'quantity' => $request->quantity,
             'supplier_id' => $request->supplier_id,
+            'updated_by' => auth()->id(),
         ]);
 
         return redirect()->route('products.index')->with('success', 'Product updated successfully!');

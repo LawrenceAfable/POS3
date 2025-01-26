@@ -10,14 +10,22 @@
     <input type="text" name="search" class="form-control" placeholder="Search categories..."
       value="{{ $search ?? '' }}">
   </form>
+
+  <!-- Trigger Modal -->
+  <div>
+    <button type="button" class="btn btn-success my-2" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
+      +
+    </button>
+  </div>
+
   <div style="overflow-x:auto;">
     <table class="table table-bordered">
       <thead>
         <tr>
           <th>Name</th>
           <th>Description</th>
-          <th>Edit</th>
-          <th>Delete</th>
+          <th>No. of Products</th>
+          <th>Action</th>
         </tr>
       </thead>
       <tbody>
@@ -25,19 +33,21 @@
       <tr>
         <td>{{ $category->name }}</td>
         <td>{{ $category->description }}</td>
+        <td>{{ $category->products_count }}</td>
         <td>
-        <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal"
+        <!-- Action buttons grouped together -->
+        <div class="d-flex gap-2">
+          <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal"
           data-bs-target="#editCategoryModal" data-id="{{ $category->category_id }}"
           data-name="{{ $category->name }}" data-description="{{ $category->description }}">
           Edit
-        </button>
-        </td>
-        <td>
-        <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
+          </button>
+          <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
           data-bs-target="#deleteCategoryModal" data-id="{{ $category->category_id }}"
           data-name="{{ $category->name }}">
           Delete
-        </button>
+          </button>
+        </div>
         </td>
       </tr>
     @empty
@@ -50,11 +60,11 @@
   </div>
 </div>
 
-<!-- Trigger Modal -->
+<!-- Pagination Links -->
 <div>
-  <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
-    Add a new category
-  </button>
+  {{ $categories->appends([
+  'search' => $search,
+])->links('pagination::bootstrap-5')}}
 </div>
 
 <!-- Include Add Modal -->

@@ -9,9 +9,9 @@
 
     <!-- Product List Section -->
     <div class="col-md-8">
-      <div class="card">
+      <div class="card my-2">
         <div class="card-header">
-          <h3>Product List</h3>
+          <h5>Product List</h5>
         </div>
         <div class="card-body">
 
@@ -20,83 +20,93 @@
               value="{{ $search ?? '' }}">
           </form>
           <div style="overflow-x:auto;">
-          <table class="table table-bordered">
-            <thead>
-              <tr>
-                <th></th>
-                <th>SKU</th>
-                <th>Product</th>
-                <th>Price</th>
-                <th>Quantity</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              @forelse($products as $product)
+            <table class="table table-bordered">
+              <thead>
+                <tr>
+                  <th></th>
+                  <th>SKU</th>
+                  <th>Product</th>
+                  <th>Category</th>
+                  <th>Price</th>
+                  <th>Quantity</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                @forelse($products as $product)
           <tr>
-          <td>
+            <td>
             @if ($product->image_url)
         <img src="{{ asset('storage/' . $product->image_url) }}" alt="{{ $product->name }}" width="50"
-        height="50">
+          height="50">
       @else
     <p>No image</p>
   @endif
-          </td>
-          <td>{{ $product->sku }}</td>
-          <td>{{ $product->name }}</td>
-          <td>{{ $product->price }}</td>
-          <td>{{ $product->quantity }}</td>
-          <td>
-            <input type="number" class="form-control" min="1" value="1" id="quantity-{{ $product->product_id }}">
+            </td>
+            <td>{{ $product->sku }}</td>
+            <td>{{ $product->name }}</td>
+            <td>{{ $product->category->name }}</td>
+            <td>{{ $product->price }}</td>
+            <td>{{ $product->quantity }}</td>
+            <td>
+            <input type="number" class="form-control" min="1" value="1"
+              id="quantity-{{ $product->product_id }}">
             <button class="btn btn-primary mt-2 add-to-cart" data-id="{{ $product->product_id }}">Add to
-            Cart</button>
-          </td>
+              Cart</button>
+            </td>
           </tr>
         @empty
-        <tr>
+      <tr>
         <td colspan="6" class="text-center">No products available.</td>
-        </tr>
-      @endforelse
-            </tbody>
-          </table>
+      </tr>
+    @endforelse
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
+      <!-- Pagination Links -->
+      <div> {{ $products->appends(['search' => $search,])->links('pagination::bootstrap-5')}}
+      </div>
     </div>
+
 
     <!-- Cart Section -->
     <div class="col-md-4">
       <div class="card">
         <div class="card-header">
-          <h3>Cart</h3>
+          <h5>Cart</h5>
         </div>
         <div class="card-body">
-          <table class="table table-bordered">
-            <thead>
-              <tr>
-                <th>Product</th>
-                <th>Qty</th>
-                <th>Subtotal</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              @foreach($cart as $productId => $item)
+          <div style="overflow-x:auto;">
+            <table class="table table-bordered">
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th>Qty</th>
+                  <th>Subtotal</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                @foreach($cart as $productId => $item)
           <tr>
-          <td>{{ $item['name'] }}</td>
-          <td>{{ $item['quantity'] }}</td>
-          <td>{{ $item['subtotal'] }}</td>
-          <td>
+            <td>{{ $item['name'] }}</td>
+            <td>{{ $item['quantity'] }}</td>
+            <td>{{ $item['subtotal'] }}</td>
+            <td>
             <form action="{{ route('pos.removeFromCart') }}" method="POST">
-            @csrf
-            <input type="hidden" name="product_id" value="{{ $productId }}">
-            <button type="submit" class="btn btn-danger">Remove</button>
+              @csrf
+              <input type="hidden" name="product_id" value="{{ $productId }}">
+              <button type="submit" class="btn btn-danger">Remove</button>
             </form>
-          </td>
+            </td>
           </tr>
         @endforeach
-            </tbody>
-          </table>
+              </tbody>
+            </table>
+          </div>
+
 
           <!-- Checkout Section -->
           <div class="mt-3">
@@ -139,18 +149,20 @@
                   <option value="mobile payment">Mobile Payment</option>
                 </select>
               </div>
-
-              <!-- Review Invoice Button -->
-              <button id="review-invoice-btn" class="btn btn-info btn-block mt-3">Review Invoice</button>
-
               <!-- Checkout Button -->
-              <button id="checkout-btn" class="btn btn-success btn-block mt-3">Checkout</button>
+              <button class="btn btn-success btn-block mt-3" data-bs-toggle="modal"
+                data-bs-target="#orderPreviewModal">Checkout</button>
             </div>
           </div>
         </div>
       </div>
     </div>
+
+
   </div>
+
+  <!-- Include the Modal -->
+  @include('pos.preview')
 
   <!-- Scripts for Cart and Checkout -->
   <script>
@@ -178,41 +190,6 @@
           });
       });
     });
-
-    // Review Invoice Functionality
-    document.getElementById('review-invoice-btn').addEventListener('click', function () {
-      const tax = document.getElementById('tax').value;
-      const discount = document.getElementById('discount').value;
-      const charge = document.getElementById('charge').value;
-      const paymentMode = document.getElementById('payment_mode').value;
-      const customerId = document.getElementById('customer_id').value;
-
-      fetch('pos.invoice-preview', {
-        method: 'POST',
-        headers: {
-          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          tax: tax,
-          discount: discount,
-          charge: charge,
-          payment_mode: paymentMode,
-          customer_id: customerId
-        })
-      }).then(response => response.json())
-        .then(data => {
-          if (data.error) {
-            alert(data.error);
-          } else {
-            // Redirect to the invoice preview page
-            window.location.href = 'pos.invoice-preview';
-            // Adjust if you're displaying in a modal instead
-          }
-        })
-        .catch(error => console.error('Error:', error));
-    });
-
     // Checkout Functionality
     document.getElementById('checkout-btn').addEventListener('click', function () {
       const tax = document.getElementById('tax').value;

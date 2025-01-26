@@ -23,7 +23,7 @@ class CustomerController extends Controller
                     ->orWhere('contact_number', 'like', "%{$search}%");
                 // Add more fields if necessary, like filtering by related orders, etc.
             })
-            ->get(); // Fetch filtered customers
+            ->paginate(2); // Fetch filtered customers
 
         return view('customers.index', [
             'customers' => $customers,

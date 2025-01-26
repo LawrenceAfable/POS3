@@ -4,85 +4,145 @@
 @section('page-title', 'Products List')
 
 @section('content')
-<div>
-  <!-- Search and Category Filter Form -->
-  <form method="GET" action="{{ route('products.index') }}" class="mb-3">
-    <div class="row">
-      <div class="col-md-8">
-        <input type="text" name="search" class="form-control" placeholder="Search products..."
-          value="{{ $search ?? '' }}">
-      </div>
-      <div class="col-md-4">
-        <select name="category_id" class="form-control">
-          <option value="">All Categories</option>
-          @foreach($categories as $category)
-        <option value="{{ $category->category_id }}" {{ $category->category_id == $selectedCategoryId ? 'selected' : '' }}>
+<!-- Search and Category Filter Form -->
+<form method="GET" action="{{ route('products.index') }}" class="mb-3">
+  <div class="row">
+    <div class="col-md-4">
+      <input type="text" name="search" class="form-control" placeholder="Search products..."
+        value="{{ $search ?? '' }}">
+    </div>
+
+    <!-- Category Search -->
+    <div class="col-md-2">
+      <select name="category_id" class="form-control">
+        <option value="">All Categories</option>
+        @foreach($categories as $category)
+      <option value="{{ $category->category_id }}" {{ $category->category_id == $selectedCategoryId ? 'selected' : '' }}>
         {{ $category->name }}
-        </option>
-      @endforeach
-        </select>
+      </option>
+    @endforeach
+      </select>
+    </div>
+    <div class="col-md-2">
+      <!-- Filter button on the left -->
+      <button type="submit" class="btn btn-primary">Filter</button>
+    </div>
+
+    <!-- Quantity Filter -->
+    <div class="col-md-2">
+      <select name="quantity_filter" class="form-control">
+        <option value="">All Quantities</option>
+        <option value="0" {{ $quantityFilter === '0' ? 'selected' : '' }}>Out of Stock (0)</option>
+        <option value="1" {{ $quantityFilter === '1' ? 'selected' : '' }}>In Stock (1 or more)</option>
+      </select>
+    </div>
+    <div class="col-md-2">
+      <!-- Filter button for quantity -->
+      <button type="submit" class="btn btn-primary">Filter</button>
+    </div>
+
+  </div>
+
+  <hr>
+
+  <div class="row mt-2">
+    <div>
+      <!-- Add Product and Generate Reports buttons on the right -->
+      <div class="d-flex gap-2">
+        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addProductModal">
+          +
+        </button>
+        <a href="{{ route('productReport', [
+                  'search' => $search ?? 'null',
+                  'category_id' => $selectedCategoryId ?? 'null',
+                  'quantity_filter' => $quantityFilter ?? 'null',
+                  'sort' => $sort ?? 'asc',
+                ]) }}" class="btn btn-info">
+          Generate Report
+        </a>
       </div>
     </div>
-    <button type="submit" class="btn btn-primary mt-3">Filter</button>
-  </form>
+  </div>
 
+</form>
 
-  <!-- Table Container for Horizontal Scrolling -->
-  <div style="overflow-x:auto;">
-    <table class="table table-bordered">
-      <thead>
-        <tr>
-          <th>SKU</th>
-          <th>Name</th>
-          <th>Description</th>
-          <th>Category</th>
-          <th>Supplier</th>
-          <th>Price</th>
-          <th>Quantity</th>
-          <th>View</th>
-          <th>Edit</th>
-          <th>Delete</th>
-        </tr>
-      </thead>
-      <tbody>
-        @forelse($products as $product)
+<!-- Table -->
+<div style="overflow-x:auto;">
+  <table class="table table-bordered">
+    <thead>
       <tr>
-        <td>{{ $product->sku }}</td>
-        <td>{{ $product->name }}</td>
-        <td>{{ $product->description }}</td>
-        <td>{{ $product->category->name ?? 'N/A' }}</td>
-        <td>{{ $product->supplier->name ?? 'N/A' }}</td>
-        <td>{{ $product->price }}</td>
-        <td>{{ $product->quantity }}
+        <th>SKU</th>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Category</th>
+        <th>Supplier</th>
+        <th>
+          <!-- Price Header with Sorting -->
+          <a href="{{ route('products.index', ['search' => $search, 'category_id' => $selectedCategoryId, 'sort' => $sort === 'desc' ? 'asc' : 'desc',]) }}"
+            class="text-decoration-none">
+            Price
+            @if ($sort === 'desc')
+        <i class="fas fa-arrow-down"></i> <!-- Down arrow for descending -->
+      @else
+    <i class="fas fa-arrow-up"></i> <!-- Up arrow for ascending -->
+  @endif
+          </a>
+        </th>
+        <th>Quantity</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      @forelse($products as $product)
+      <tr>
+      <td>{{ $product->sku }}</td>
+      <td>{{ $product->name }}</td>
+      <td>{{ $product->description }}</td>
+      <td>{{ $product->category->name ?? 'N/A' }}</td>
+      <td>{{ $product->supplier->name ?? 'N/A' }}</td>
+      <td>{{ $product->price }}</td>
+      <td>
+        {{ $product->quantity }}
         @if($product->quantity < $product->low_stock_threshold)
       <span class="text-danger">Low Stock</span>
     @endif
-        </td>
-        <td><a href="{{ route('products.view', $product->product_id) }}" class="btn btn-info">View</a></td>
-        <td><button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal"
+      </td>
+      <td>
+        <!-- Action buttons grouped together -->
+        <div class="d-flex gap-2">
+        <a href="{{ route('products.view', $product->product_id) }}" class="btn btn-info btn-sm">View</a>
+        <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal"
           data-bs-target="#editProductModal" data-id="{{ $product->product_id }}" data-sku="{{ $product->sku }}"
           data-name="{{ $product->name }}" data-description="{{ $product->description }}"
           data-category="{{ $product->category_id }}" data-supplier="{{ $product->supplier_id }}"
-          data-price="{{ $product->price }}" data-quantity="{{ $product->quantity }}">Edit</button></td>
-        <td><button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
+          data-price="{{ $product->price }}" data-quantity="{{ $product->quantity }}">
+          Edit
+        </button>
+        <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
           data-bs-target="#deleteProductModal" data-id="{{ $product->product_id }}"
-          data-name="{{ $product->name }}">Delete</button></td>
+          data-name="{{ $product->name }}">
+          Delete
+        </button>
+        </div>
+      </td>
       </tr>
     @empty
-    <tr>
-      <td colspan="10">No products available.</td>
-    </tr>
-  @endforelse
-      </tbody>
-    </table>
-  </div>
+      <tr>
+      <td colspan="8">No products available.</td>
+      </tr>
+    @endforelse
+    </tbody>
+  </table>
 </div>
 
-<!-- Add Product Button -->
+<!-- Pagination Links -->
 <div>
-  <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addProductModal">
-    Add a new product
-  </button>
+  {{ $products->appends([
+  'search' => $search,
+  'category_id' => $selectedCategoryId,
+  'sort' => $sort,
+  'quantity_filter' => $quantityFilter,
+])->links('pagination::bootstrap-5') }}
 </div>
 
 <!-- Include Modals -->

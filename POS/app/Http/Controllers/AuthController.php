@@ -65,7 +65,7 @@ class AuthController extends Controller
             return redirect('/')->with('success', 'Logged in successfully!');
         } else {
             // Authentication failed
-            return back()->withErrors(['email' => 'Invalid email or password.'])->withInput();
+            return back()->withErrors(['email' => 'Invalid credentials.'])->withInput();
         }
 
     }

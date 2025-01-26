@@ -15,47 +15,7 @@ use Illuminate\Support\Facades\Session;
 
 class POSController extends Controller
 {
-    // not using
-    public function index1()
-    {
-        $products = Product::where('quantity', '>', 0)->get();
-        $cart = session()->get('cart', []);
-        $customers = Customer::all();
-        $settings = Setting::first(); // Fetch the first (and possibly only) setting row
-
-        return view('pos.index', compact('products', 'cart', 'customers', 'settings'));
-    }
-
-    // not using
-    public function index2(Request $request)
-    {
-        $search = $request->input('search'); // Get the search input
-
-        $products = Product::query()
-            ->when($search, function ($query, $search) {
-                $query->where('name', 'like', "%{$search}%")
-                    ->orWhere('description', 'like', "%{$search}%")
-                    ->orWhere('sku', 'like', "%{$search}%")
-                    ->orWhereHas('category', function ($query) use ($search) {
-                        $query->where('name', 'like', "%{$search}%");
-                    })
-                    ->orWhereHas('supplier', function ($query) use ($search) {
-                        $query->where('name', 'like', "%{$search}%")
-                            ->orWhere('email', 'like', "%{$search}%");
-                    });
-            })->get(); // Fetch filtered products
-
-        $categories = Category::all(); // Fetch all categories
-        $suppliers = Supplier::all(); // Fetch all suppliers
-
-        return view("products.index", [
-            'products' => $products,
-            'categories' => $categories,
-            'suppliers' => $suppliers,
-            'search' => $search, // Pass the search term back to the view
-        ]);
-    }
-
+    // ORIGINAL
     public function index(Request $request)
     {
         // Get the search input
@@ -65,18 +25,16 @@ class POSController extends Controller
         $products = Product::query()
             ->when($search, function ($query, $search) {
                 $query->where('name', 'like', "%{$search}%")
-                    ->orWhere('description', 'like', "%{$search}%")
                     ->orWhere('sku', 'like', "%{$search}%")
                     ->orWhereHas('category', function ($query) use ($search) {
                         $query->where('name', 'like', "%{$search}%");
                     })
                     ->orWhereHas('supplier', function ($query) use ($search) {
-                        $query->where('name', 'like', "%{$search}%")
-                            ->orWhere('email', 'like', "%{$search}%");
+                        $query->where('name', 'like', "%{$search}%");
                     });
             })
             ->where('quantity', '>', 0)  // Only fetch products with quantity greater than 0
-            ->get();
+            ->paginate(10);  // Paginate with 10 items per page
 
         // Fetch other necessary data
         $cart = session()->get('cart', []);  // Get cart from session
@@ -89,6 +47,7 @@ class POSController extends Controller
         return view('pos.index', compact('products', 'cart', 'customers', 'settings', 'categories', 'suppliers', 'search'));
     }
 
+    // ORIGINAL, YUNG WALA PA SI TAX AT DISCOUNT SA CART
     public function addToCart(Request $request)
     {
         // Get product ID and quantity from request
@@ -131,6 +90,8 @@ class POSController extends Controller
 
         return response()->json(['success' => 'Product added to cart.']);
     }
+
+    // ORIGINAL
     public function removeFromCart(Request $request)
     {
         $productId = $request->input('product_id');
@@ -145,50 +106,7 @@ class POSController extends Controller
         return redirect()->route('pos.index');
     }
 
-    public function generateInvoicePreview(Request $request)
-    {
-        // Retrieve the cart from the session
-        $cart = Session::get('cart');
-
-        // Check if the cart is empty
-        if (empty($cart)) {
-            return response()->json(['error' => 'Cart is empty.']);
-        }
-
-        // Retrieve settings for tax and discount rates
-        $settings = Setting::first();
-
-        // Get the provided tax and discount values, or use default if not provided
-        $tax = $request->tax ?? $settings->tax_rate;
-        $discount = $request->discount ?? $settings->discount_rate;
-
-        // Calculate the total price, tax, discount, and grand total
-        $total = array_sum(array_column($cart, 'subtotal'));
-        $taxAmount = $total * ($tax / 100);
-        $discountAmount = $total * ($discount / 100);
-        $grandTotal = $total + $taxAmount - $discountAmount;
-
-        // Get customer info if selected (or default if not)
-        $customer = Customer::find($request->customer_id);
-
-        // Prepare data for the invoice preview
-        $invoiceData = [
-            'cart' => $cart,
-            'tax' => $tax,
-            'discount' => $discount,
-            'total' => $total,
-            'taxAmount' => $taxAmount,
-            'discountAmount' => $discountAmount,
-            'grandTotal' => $grandTotal,
-            'customer' => $customer,
-        ];
-
-        // Instead of returning JSON, return the view
-        return view('pos.invoice-preview', compact('invoiceData'));
-    }
-
-
-
+    // ORIGINAL
     public function checkout(Request $request)
     {
         $request->validate([
@@ -225,9 +143,14 @@ class POSController extends Controller
         $grandTotal = $total + $taxAmount - $discountAmount;
 
         // Check if the customer payment is sufficient
-        if ($customerPayment < $grandTotal) {
-            return response()->json(['error' => 'Insufficient payment. Please enter an amount equal to or greater than the total.']);
+        if ($customerPayment <= 0 || $customerPayment < $grandTotal) {
+            $errorMessage = $customerPayment <= 0
+                ? 'Quantity must be greater than zero.'
+                : 'Insufficient payment. Please enter an amount equal to or greater than the total.';
+
+            return response()->json(['error' => $errorMessage]);
         }
+
 
         // Try to save the order and transaction
         try {
@@ -279,5 +202,8 @@ class POSController extends Controller
             return response()->json(['error' => 'Checkout failed: ' . $e->getMessage()]);
         }
     }
+
+
+
 
 }

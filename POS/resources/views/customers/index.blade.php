@@ -10,14 +10,20 @@
     <input type="text" name="search" class="form-control" placeholder="Search customers.." value="{{ $search ?? '' }}">
   </form>
 
+  <!-- Trigger Modal -->
+  <div>
+    <button type="button" class="btn btn-success my-2" data-bs-toggle="modal" data-bs-target="#addCustomerModal">
+      +
+    </button>
+  </div>
+
   <div style="overflow-x:auto;">
     <table class="table table-bordered">
       <thead>
         <tr>
           <th>Name</th>
           <th>Contact Number</th>
-          <th>Edit</th>
-          <th>Delete</th>
+          <th>Action</th>
         </tr>
       </thead>
       <tbody>
@@ -26,18 +32,19 @@
         <td>{{ $customer->name }}</td>
         <td>{{ $customer->contact_number }}</td>
         <td>
-        <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal"
+        <!-- Action buttons grouped together -->
+        <div class="d-flex gap-2">
+          <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal"
           data-bs-target="#editCustomerModal" data-id="{{ $customer->customer_id }}"
           data-name="{{ $customer->name }}" data-contact_number="{{ $customer->contact_number }}">
           Edit
-        </button>
-        </td>
-        <td>
-        <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
+          </button>
+          <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
           data-bs-target="#deleteCustomerModal" data-id="{{ $customer->customer_id }}"
           data-name="{{ $customer->name }}">
           Delete
-        </button>
+          </button>
+        </div>
         </td>
       </tr>
     @empty
@@ -50,11 +57,11 @@
   </div>
 </div>
 
-<!-- Trigger Modal -->
+<!-- Pagination Links -->
 <div>
-  <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCustomerModal">
-    Add a new customer
-  </button>
+  {{ $customers->appends([
+  'search' => $search,
+])->links('pagination::bootstrap-5')}}
 </div>
 
 <!-- Include Add Modal -->

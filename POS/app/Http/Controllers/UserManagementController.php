@@ -8,13 +8,6 @@ use Hash;
 
 class UserManagementController extends Controller
 {
-
-    public function index1()
-    {
-        $users = User::all();
-        return view('admin.userrole.index', ['users' => $users]);
-    }
-
     public function index(Request $request)
     {
         $search = $request->input('search'); // Get the search input
@@ -26,7 +19,7 @@ class UserManagementController extends Controller
                     ->orWhere('role', 'like', "%{$search}%"); // Assuming there's a role field, adjust if needed
                 // Add more fields if necessary, like filtering by other user-related attributes
             })
-            ->get(); // Fetch filtered users
+            ->paginate(2); // Fetch filtered users
 
         return view('admin.userrole.index', [
             'users' => $users,
@@ -34,39 +27,60 @@ class UserManagementController extends Controller
         ]);
     }
 
+    public function add()
+    {
+        return view('admin.userrole.modals.add');
+    }
 
     public function store(Request $request)
     {
+        // Validate the input
         $request->validate([
             'name' => 'required',
             'email' => 'required|email|unique:users',
             'role' => 'required',
-            'password' => 'required|min:5|max:15',
-            // 'confirm_password' => 'required|same:password'
+            'password' => [
+                'required',
+                'min:8', // Minimum 12 characters
+                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/',
+            ],
+        ], [
+            'password.regex' => 'The password must contain at least:
+            - One uppercase letter (A-Z),
+            - One lowercase letter (a-z),
+            - One number (0-9), and
+            - One special character (@$!%*?&).',
         ]);
 
-
+        // Create the user
         User::create([
             'name' => $request['name'],
             'email' => $request['email'],
             'role' => $request['role'],
-            'password' => Hash::make($request['password'])
+            'password' => Hash::make($request['password']),
+            'status' => 0, // Newly created users are automatically active
         ]);
 
         session()->flash('success', 'User added successfully.');
         return redirect()->route('admin.userrole.index');
-
-       // return redirect()->route('admin.userrole.index')->with('success', 'User added successfully.');
     }
 
-    public function Update(Request $request, $id)
+    public function edit($id)
+    {
+        $user = User::findOrFail($id);
+        // dd($user); // Debugging: Check the user object
+        return view('admin.userrole.modals.edit', compact('user'));
+    }
+
+    public function update(Request $request, $id)
     {
         $request->validate([
             'name' => 'required',
             'email' => "required|email|unique:users,email,{$id}",
             'role' => 'required',
             'password' => 'nullable|min:5|max:15',
-            'confirm_password' => 'nullable|same:password'
+            'confirm_password' => 'nullable|same:password',
+            'status' => 'required',
         ]);
 
         $user = User::findOrFail($id);
@@ -81,6 +95,7 @@ class UserManagementController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'role' => $request->role,
+            'status' => $request->status,
         ];
 
         // Update password only if provided
@@ -93,9 +108,6 @@ class UserManagementController extends Controller
         session()->flash('success', 'User updated successfully.');
         return redirect()->route('admin.userrole.index');
     }
-
-
-
 
     // Delete a user
     public function destroy($id)

@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('email')->unique;
             $table->string('password');
             $table->enum('role', ['admin', 'cashier'])->default('cashier');
+            $table->tinyInteger('status')->default(0); // Use tinyInteger for status (0 = Active, 1 = Inactive)
             $table->timestamps();
         });
     }

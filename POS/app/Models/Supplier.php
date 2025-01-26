@@ -11,6 +11,7 @@ class Supplier extends Model
         'email',
         'phone',
         'address',
+        'status',
     ];
 
     protected $primaryKey = 'supplier_id'; // Define the custom primary key

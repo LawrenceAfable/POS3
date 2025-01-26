@@ -10,6 +10,13 @@
     <input type="text" name="search" class="form-control" placeholder="Search suppliers..." value="{{ $search ?? '' }}">
   </form>
 
+  <!-- Trigger Modal -->
+  <div>
+    <button type="button" class="btn btn-success my-2" data-bs-toggle="modal" data-bs-target="#addSupplierModal">
+      +
+    </button>
+  </div>
+
   <div style="overflow-x:auto;">
     <table class="table table-bordered">
       <thead>
@@ -18,8 +25,8 @@
           <th>Email</th>
           <th>Phone</th>
           <th>Address</th>
-          <th>Edit</th>
-          <th>Delete</th>
+          <th>Status</th>
+          <th>Action</th>
         </tr>
       </thead>
       <tbody>
@@ -29,20 +36,24 @@
         <td>{{ $supplier->email }}</td>
         <td>{{ $supplier->phone }}</td>
         <td>{{ $supplier->address }}</td>
-        <td>
-        <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal"
-          data-bs-target="#editSupplierModal" data-id="{{ $supplier->supplier_id }}"
-          data-name="{{ $supplier->name }}" data-email="{{ $supplier->email }}" data-phone="{{ $supplier->phone }}"
-          data-address="{{ $supplier->address }}">
-          Edit
-        </button>
+        <td style="color: {{ $supplier->status == 0 ? 'green' : 'red' }};">
+        {{ $supplier->status == 0 ? 'Active' : 'Inactive' }}
         </td>
         <td>
-        <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
+        <div class="d-flex gap-2">
+          <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal"
+          data-bs-target="#editSupplierModal" data-id="{{ $supplier->supplier_id }}"
+          data-name="{{ $supplier->name }}" data-email="{{ $supplier->email }}"
+          data-phone="{{ $supplier->phone }}" data-address="{{ $supplier->address }}"
+          data-status="{{ $supplier->status }}">
+          Edit
+          </button>
+          <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
           data-bs-target="#deleteSupplierModal" data-id="{{ $supplier->supplier_id }}"
           data-name="{{ $supplier->name }}">
           Delete
-        </button>
+          </button>
+        </div>
         </td>
       </tr>
     @empty
@@ -55,11 +66,11 @@
   </div>
 </div>
 
-<!-- Trigger Modal -->
+<!-- Pagination Links -->
 <div>
-  <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addSupplierModal">
-    Add a new supplier
-  </button>
+  {{ $suppliers->appends([
+  'search' => $search,
+])->links('pagination::bootstrap-5')}}
 </div>
 
 <!-- Include Add Modal -->
@@ -82,6 +93,7 @@
     const editEmailInput = document.getElementById('edit-email');
     const editPhoneInput = document.getElementById('edit-phone');
     const editAddressInput = document.getElementById('edit-address');
+    const editStatusInput = document.getElementById('edit-status');
 
     editSupplierModal.addEventListener('show.bs.modal', function (event) {
       const button = event.relatedTarget;
@@ -90,12 +102,14 @@
       const supplierEmail = button.getAttribute('data-email');
       const supplierPhone = button.getAttribute('data-phone');
       const supplierAddress = button.getAttribute('data-address');
+      const supplierStatus = button.getAttribute('data-status');
 
       editForm.action = `/supplier/${supplierId}/update`;
       editNameInput.value = supplierName;
       editEmailInput.value = supplierEmail;
       editPhoneInput.value = supplierPhone;
       editAddressInput.value = supplierAddress;
+      editStatusInput.value = supplierStatus;
     });
 
     // Delete Modal Logic

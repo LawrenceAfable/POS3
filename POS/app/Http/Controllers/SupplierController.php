@@ -23,7 +23,7 @@ class SupplierController extends Controller
                     ->orWhere('phone', 'like', "%{$search}%")
                     ->orWhere('address', 'like', "%{$search}%");
             })
-            ->get(); // Fetch filtered suppliers
+            ->paginate(2); // Fetch filtered suppliers
 
         return view('suppliers.index', [
             'suppliers' => $suppliers,
@@ -61,6 +61,7 @@ class SupplierController extends Controller
             'email' => $request['email'],
             'phone' => $request['phone'],
             'address' => $request['address'],
+            'status' => 0, // Newly created suppliers are automatically active 
         ]);
 
         return redirect()->route('suppliers.index')->with('success', 'Supplier created successfully!');
@@ -73,6 +74,7 @@ class SupplierController extends Controller
             'email' => 'required|string|email|max:255|unique:suppliers,email,' . $supplier->supplier_id . ',supplier_id', // Exclude current email
             'phone' => 'nullable|string|max:20',
             'address' => 'nullable|string|max:500',
+            'status' => 'required',
         ]);
 
         $supplier->update($data);

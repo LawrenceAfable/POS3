@@ -14,6 +14,7 @@ class User extends Authenticatable // Extend Authenticatable instead of Model
         'email',
         'password',
         'role', // Add role to fillable
+        'status',
     ];
 
     // Other methods (if needed)
