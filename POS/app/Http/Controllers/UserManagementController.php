@@ -68,11 +68,10 @@ class UserManagementController extends Controller
     public function edit($id)
     {
         $user = User::findOrFail($id);
-        // dd($user); // Debugging: Check the user object
         return view('admin.userrole.modals.edit', compact('user'));
     }
 
-    public function update(Request $request, $id)
+    public function update1(Request $request, $id)
     {
         $request->validate([
             'name' => 'required',
@@ -81,6 +80,53 @@ class UserManagementController extends Controller
             'password' => 'nullable|min:5|max:15',
             'confirm_password' => 'nullable|same:password',
             'status' => 'required',
+        ]);
+
+        $user = User::findOrFail($id);
+
+        // Prevent the logged-in admin from changing their own role
+        if (auth()->user()->id === $user->id && $request->role !== 'admin') {
+            session()->flash('error', 'You cannot change your own role.');
+            return redirect()->back();
+        }
+
+        $updateData = [
+            'name' => $request->name,
+            'email' => $request->email,
+            'role' => $request->role,
+            'status' => $request->status,
+        ];
+
+        // Update password only if provided
+        if ($request->filled('password')) {
+            $updateData['password'] = Hash::make($request->password);
+        }
+
+        $user->update($updateData);
+
+        session()->flash('success', 'User updated successfully.');
+        return redirect()->route('admin.userrole.index');
+    }
+
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'name' => 'required',
+            'email' => "required|email|unique:users,email,{$id}",
+            'role' => 'required',
+            'password' => [
+                'nullable',
+                'min:8', // Minimum 8 characters
+                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/',
+            ],
+            'confirm_password' => 'nullable|same:password', // Add confirm_password validation
+            'status' => 'required',
+        ], [
+            'password.regex' => 'The password must contain at least:
+        - One uppercase letter (A-Z),
+        - One lowercase letter (a-z),
+        - One number (0-9), and
+        - One special character (@$!%*?&).',
         ]);
 
         $user = User::findOrFail($id);

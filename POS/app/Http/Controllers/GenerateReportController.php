@@ -38,15 +38,6 @@ class GenerateReportController extends Controller
             $query->where('category_id', $category_id);
         }
 
-        // // Apply quantity filter (if quantity filter is selected and is not empty)
-        // if (!empty($quantity_filter) && $quantity_filter !== 'null') {
-        //     if ($quantity_filter === '0') {
-        //         $query->where('quantity', 0); // Filter for out-of-stock products
-        //     } elseif ($quantity_filter === '1') {
-        //         $query->where('quantity', '>', 0); // Filter for in-stock products
-        //     }
-        // }
-
         if (!empty($quantity_filter) && $quantity_filter !== 'null') {
             if ($quantity_filter === '0') {
                 $query->where('quantity', '<=', 0); // Filter for zero or below quantity

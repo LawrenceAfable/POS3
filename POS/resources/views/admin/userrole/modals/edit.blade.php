@@ -39,7 +39,7 @@
         @if(auth()->user()->id !== $user->id)
           <div class="mb-3">
             <label for="edit-role" class="form-label">Role</label>
-            <select id="edit-role" name="role" class="form-select" required>
+            <select id="edit-role" name="role" class="form-select" readonly>
               <option value="admin" {{ $user->role == 'admin' ? 'selected' : '' }}>Admin</option>
               <option value="cashier" {{ $user->role == 'cashier' ? 'selected' : '' }}>Cashier</option>
             </select>
@@ -50,7 +50,11 @@
         <div class="mb-3">
           <label for="edit-password" class="form-label">New Password <small>(Leave blank to keep current)</small></label>
           <input type="password" id="edit-password" name="password" class="form-control" minlength="5" maxlength="15">
+          @error('password')
+            <div class="text-danger">{{ $message }}</div>
+          @enderror
         </div>
+        
 
         <!-- Confirm Password -->
         <div class="mb-3">
@@ -60,7 +64,7 @@
         </div>
       </div>
       <div class="card-footer">
-        <button type="button" class="btn btn-secondary" onclick="window.history.back();">Cancel</button>
+        <button type="button" class="btn btn-danger" onclick="window.history.back();">Cancel</button>
         <button type="submit" class="btn btn-warning">Update User</button>
       </div>
     </div>
